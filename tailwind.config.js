@@ -13,4 +13,5 @@ export default {
 		require("@tailwindcss/forms"),
 		require("@tailwindcss/container-queries"),
 	],
+	presets: [require("@mantine/core/styles.css")],
 };
