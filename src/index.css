@@ -12,4 +12,40 @@
 		font-variation-settings: "wdth" 100;
 		font-optical-sizing: auto;
 	}
+
+	:root {
+		--background: 248 250 252; /* #F8FAFC */
+		--surface: 255 255 255; /* #FFFFFF */
+		--surface-hover: 241 245 249; /* #F1F5F9 */
+
+		--primary: 34 197 94; /* #22C55E */
+		--secondary: 59 130 246; /* #3B82F6 */
+
+		--text-main: 30 41 59; /* #1E293B */
+		--text-secondary: 100 116 139; /* #64748B */
+
+		--border: 226 232 240; /* #E2E8F0 */
+		--input: 255 255 255; /* #FFFFFF */
+
+		--status-error: 239 68 68; /* #EF4444 */
+		--status-warning: 245 158 11; /* #F59E0B */
+	}
+
+	.dark {
+		--background: 15 23 42; /* #0F172A */
+		--surface: 30 41 59; /* #1E293B */
+		--surface-hover: 51 65 85; /* #334155 */
+
+		--primary: 34 197 94; /* #22C55E */
+		--secondary: 59 130 246; /* #3B82F6 */
+
+		--text-main: 248 250 252; /* #F8FAFC */
+		--text-secondary: 148 163 184; /* #94A3B8 */
+
+		--border: 51 65 85; /* #334155 */
+		--input: 51 65 85; /* #334155 */
+
+		--status-error: 248 113 113; /* #F87171 */
+		--status-warning: 251 191 36; /* #FBBF24 */
+	}
 }
