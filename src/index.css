@@ -1,51 +1,63 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 @import "tailwindcss";
 
+@theme {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  
+  --color-text-main: var(--text-main);
+  --color-text-secondary: var(--text-secondary);
+  
+  --color-border: var(--border);
+  --color-input: var(--input);
+  
+  --color-status-error: var(--status-error);
+  --color-status-warning: var(--status-warning);
+
+  --font-inter: "Inter", sans-serif;
+  --font-roboto: "Roboto", sans-serif;
+}
+
 @layer base {
-	html {
-		font-family: "Inter", sans-serif;
-		font-optical-sizing: auto;
-	}
+  :root {
+    --background: #f8fafc;
+    --surface: #ffffff;
+    --surface-hover: #f1f5f9;
 
-	.font-roboto {
-		font-family: "Roboto", sans-serif;
-		font-variation-settings: "wdth" 100;
-		font-optical-sizing: auto;
-	}
+    --primary: #22c55e;
+    --secondary: #3b82f6;
 
-	:root {
-		--background: 248 250 252; /* #F8FAFC */
-		--surface: 255 255 255; /* #FFFFFF */
-		--surface-hover: 241 245 249; /* #F1F5F9 */
+    --text-main: #1e293b;
+    --text-secondary: #64748b;
 
-		--primary: 34 197 94; /* #22C55E */
-		--secondary: 59 130 246; /* #3B82F6 */
+    --border: #e2e8f0;
+    --input: #ffffff;
 
-		--text-main: 30 41 59; /* #1E293B */
-		--text-secondary: 100 116 139; /* #64748B */
+    --status-error: #ef4444;
+    --status-warning: #f59e0b;
 
-		--border: 226 232 240; /* #E2E8F0 */
-		--input: 255 255 255; /* #FFFFFF */
+    font-family: var(--font-inter); 
+  }
 
-		--status-error: 239 68 68; /* #EF4444 */
-		--status-warning: 245 158 11; /* #F59E0B */
-	}
+  .dark {
+    --background: #0f172a;
+    --surface: #1e293b;
+    --surface-hover: #334155;
 
-	.dark {
-		--background: 15 23 42; /* #0F172A */
-		--surface: 30 41 59; /* #1E293B */
-		--surface-hover: 51 65 85; /* #334155 */
+    --text-main: #f8fafc;
+    --text-secondary: #94a3b8;
 
-		--primary: 34 197 94; /* #22C55E */
-		--secondary: 59 130 246; /* #3B82F6 */
+    --border: #334155;
+    --input: #334155;
 
-		--text-main: 248 250 252; /* #F8FAFC */
-		--text-secondary: 148 163 184; /* #94A3B8 */
+    --status-error: #f87171;
+    --status-warning: #fbbf24;
+  }
+}
 
-		--border: 51 65 85; /* #334155 */
-		--input: 51 65 85; /* #334155 */
-
-		--status-error: 248 113 113; /* #F87171 */
-		--status-warning: 251 191 36; /* #FBBF24 */
-	}
+.font-roboto {
+  font-variation-settings: "wdth" 100;
 }
