@@ -4,7 +4,7 @@ import { Box, Button, Container, Paper, PasswordInput, Stack, Text, Title } from
 import { useForm } from "react-hook-form";
 import { FaLock } from "react-icons/fa";
 import { useParams } from "react-router";
-import { ThemeToggle } from "../../components/ThemeToggle";
+import { ThemeToggle } from "../../components";
 import { type ResetPasswordRequest, resetPasswordSchema } from "../../schemas";
 
 const ResetPasswordPage = () => {
