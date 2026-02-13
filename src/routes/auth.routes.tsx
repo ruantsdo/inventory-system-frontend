@@ -1,9 +1,8 @@
 import type { RouteObject } from "react-router";
-import { ForgotPasswordPage, LogingPage, NotFoundPage, ResetPasswordPage } from "../pages";
+import { ForgotPasswordPage, LogingPage, ResetPasswordPage } from "../pages";
 
 export const authRoutes: RouteObject[] = [
-  { path: "/", element: <LogingPage /> },
+  { path: "/login", element: <LogingPage /> },
   { path: "/forgot-password", element: <ForgotPasswordPage /> },
   { path: "/reset-password/:token", element: <ResetPasswordPage /> },
-  { path: "*", element: <NotFoundPage /> },
 ];

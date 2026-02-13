@@ -1,6 +1,11 @@
 import type { RouteObject } from "react-router";
-import { HomePage } from "../pages";
+import DashboardLayout from "../components/layout/DashboardLayout";
+import { HomePage, NotFoundPage } from "../pages";
 
 export const appRoutes: RouteObject[] = [
-	{ path: "/home", element: <HomePage /> },
+  {
+    element: <DashboardLayout />,
+    children: [{ path: "/dashboard", element: <HomePage /> }],
+  },
+  { path: "*", element: <NotFoundPage /> },
 ];

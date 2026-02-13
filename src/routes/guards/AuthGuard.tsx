@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router";
 
 export const AuthGuard = () => {
-  const isAuth = false; 
+  const isAuth = true;
 
-  return isAuth ? <Outlet /> : <Navigate to="/" replace />;
+  return isAuth ? <Outlet /> : <Navigate to="/login" replace />;
 };
