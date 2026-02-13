@@ -45,7 +45,7 @@ const ForgotPasswordPage = () => {
                   Redefinição de senha
                 </Title>
                 <Text size="md" ta="center" fw={500} mt={4} className="text-primary">
-                  Informe os dados abaixo para redefinir sua senha
+                  Confirme seus dados para prosseguir
                 </Text>
               </Box>
             </Stack>
