@@ -7,7 +7,7 @@ const PageNotFound = () => {
   const navigate = useNavigate();
 
   const handleGoBack = () => {
-    navigate("/");
+    navigate("/dashboard");
   };
   return (
     <Box className="bg-background h-screen w-screen relative flex flex-col items-center justify-center">
