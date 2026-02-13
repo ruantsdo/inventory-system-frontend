@@ -20,7 +20,7 @@ import { FaLock, FaPlus, FaSignInAlt, FaUser } from "react-icons/fa";
 import { Link } from "react-router";
 import { withMask } from "use-mask-input";
 import { ThemeToggle } from "../../components";
-import { type LoginRequest, loginSchema } from "../../schemas";
+import { type LoginRequest, loginSchema } from "../../schemas/auth";
 
 const LoginPage = () => {
   const {
