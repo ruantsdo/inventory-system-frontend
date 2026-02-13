@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "@lottiefiles/dotlottie-react": "^0.17.15",
     "@mantine/carousel": "^8.3.14",
     "@mantine/charts": "^8.3.14",
     "@mantine/core": "^8.3.14",
