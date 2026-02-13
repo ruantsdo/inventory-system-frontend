@@ -4,16 +4,16 @@
   --color-background: var(--background);
   --color-surface: var(--surface);
   --color-surface-hover: var(--surface-hover);
-  
+
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
-  
+
   --color-text-main: var(--text-main);
   --color-text-secondary: var(--text-secondary);
-  
+
   --color-border: var(--border);
   --color-input: var(--input);
-  
+
   --color-status-error: var(--status-error);
   --color-status-warning: var(--status-warning);
 
@@ -39,7 +39,7 @@
     --status-error: #ef4444;
     --status-warning: #f59e0b;
 
-    font-family: var(--font-inter); 
+    font-family: var(--font-inter);
   }
 
   .dark {
