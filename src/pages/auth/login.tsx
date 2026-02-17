@@ -43,7 +43,7 @@ const LoginPage = () => {
   return (
     <Box className="bg-background h-screen w-screen relative">
       <Box pos="absolute" top={20} right={20}>
-        <ThemeToggle />
+        <ThemeToggle iconOnly />
       </Box>
       <Container
         size="xs"
