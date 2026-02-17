@@ -12,7 +12,7 @@ const PageNotFound = () => {
   return (
     <Box className="bg-background h-screen w-screen relative flex flex-col items-center justify-center">
       <Box pos="absolute" top={20} right={20}>
-        <ThemeToggle />
+        <ThemeToggle iconOnly />
       </Box>
       <Box p="xl">
         <Stack align="center" mb="lg">
