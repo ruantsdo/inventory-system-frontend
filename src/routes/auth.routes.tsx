@@ -1,5 +1,5 @@
 import type { RouteObject } from "react-router";
-import { ForgotPasswordPage, LogingPage, ResetPasswordPage } from "../pages";
+import { ForgotPasswordPage, LogingPage, ResetPasswordPage } from "../pages/auth";
 
 export const authRoutes: RouteObject[] = [
   { path: "/login", element: <LogingPage /> },

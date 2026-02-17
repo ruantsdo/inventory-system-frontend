@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { FaLock } from "react-icons/fa";
 import { useParams } from "react-router";
 import { ThemeToggle } from "../../components";
-import { type ResetPasswordRequest, resetPasswordSchema } from "../../schemas";
+import { type ResetPasswordRequest, resetPasswordSchema } from "../../schemas/auth";
 
 const ResetPasswordPage = () => {
   const { token } = useParams();
