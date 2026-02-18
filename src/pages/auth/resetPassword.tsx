@@ -1,14 +1,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, Container, Paper, PasswordInput, Stack, Text, Title } from "@mantine/core";
-
+import { notifications } from "@mantine/notifications";
 import { useForm } from "react-hook-form";
 import { FaLock } from "react-icons/fa";
 import { useParams } from "react-router";
 import { ThemeToggle } from "../../components";
 import { type ResetPasswordRequest, resetPasswordSchema } from "../../schemas/auth";
+import { useAuthStore } from "../../stores/auth";
 
 const ResetPasswordPage = () => {
+  const { resetPassword, isLoading } = useAuthStore();
   const { token } = useParams();
+
   const {
     register,
     handleSubmit,
@@ -22,8 +25,20 @@ const ResetPasswordPage = () => {
   });
 
   const onSubmit = (data: ResetPasswordRequest) => {
-    console.log("Reset Password Data:", data);
-    console.log("Token:", token);
+    if (!token) {
+      notifications.show({
+        title: "Sem token",
+        message:
+          "Para redefinir sua senha, por favor, use o link de redefinição enviado para o seu e-mail.",
+        color: "var(--status-error)",
+        position: "bottom-center",
+        autoClose: 10000,
+      });
+
+      return;
+    }
+
+    resetPassword(data, token);
   };
 
   return (
@@ -31,6 +46,7 @@ const ResetPasswordPage = () => {
       <Box pos="absolute" top={20} right={20}>
         <ThemeToggle iconOnly />
       </Box>
+
       <Container
         size="xs"
         h="100vh"
@@ -91,6 +107,7 @@ const ResetPasswordPage = () => {
                   className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   radius="md"
                   size="md"
+                  loading={isLoading}
                 >
                   Redefinir senha
                 </Button>

@@ -14,6 +14,7 @@ import {
   FaTachometerAlt,
 } from "react-icons/fa";
 import { useNavigate } from "react-router";
+import { useAuthStore } from "../stores/auth";
 import { ThemeToggle } from "./ThemeToggle";
 
 interface NavItem {
@@ -57,6 +58,7 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: SidebarProps) {
   const [activeItem, setActiveItem] = useState("/dashboard");
+  const logout = useAuthStore((state) => state.logout);
 
   const isCollapsed = collapsed && !mobileOpen;
 
@@ -264,7 +266,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
                   </Text>
                 </Box>
                 <Tooltip label="Sair" position="top" withArrow>
-                  <ActionIcon variant="subtle" color="red" size="md" radius="md">
+                  <ActionIcon variant="subtle" color="red" size="md" radius="md" onClick={logout}>
                     <FaSignOutAlt size={14} />
                   </ActionIcon>
                 </Tooltip>
