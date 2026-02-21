@@ -1,26 +1,25 @@
 import { Box, UnstyledButton } from "@mantine/core";
-import { useState } from "react";
 import { FaBars } from "react-icons/fa";
 import { Outlet } from "react-router";
 import { Sidebar } from "../components/Sidebar";
+import { useUIStore } from "../stores/context";
 
 export function AppLayout() {
-  const [collapsed, setCollapsed] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const { isSidebarOpen, toggleSidebar, isMobileSidebarOpen, toggleMobileSidebar } = useUIStore();
 
   return (
     <Box className="flex h-screen bg-background overflow-hidden">
       <Sidebar
-        collapsed={collapsed}
-        onToggle={() => setCollapsed((c) => !c)}
-        mobileOpen={mobileOpen}
-        onMobileClose={() => setMobileOpen(false)}
+        collapsed={isSidebarOpen}
+        onToggle={() => toggleSidebar()}
+        mobileOpen={isMobileSidebarOpen}
+        onMobileClose={() => toggleMobileSidebar()}
       />
 
       <Box className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Box className="md:hidden flex items-center px-4 h-14 bg-surface border-b border-border">
           <UnstyledButton
-            onClick={() => setMobileOpen(true)}
+            onClick={() => toggleMobileSidebar()}
             className="p-2 rounded-lg hover:bg-surface-hover text-text-main transition-colors"
           >
             <FaBars size={20} />
