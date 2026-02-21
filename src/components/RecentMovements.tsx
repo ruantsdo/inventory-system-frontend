@@ -1,5 +1,5 @@
-import { Badge, Box, Paper, Table, Text, UnstyledButton } from "@mantine/core";
-import { FaFilter } from "react-icons/fa";
+import { Badge, Box, Button, Paper, Table, Text } from "@mantine/core";
+import { useNavigate } from "react-router";
 
 interface Movement {
   id: number;
@@ -51,6 +51,12 @@ const movements: Movement[] = [
 ];
 
 export function RecentMovements() {
+  const navigate = useNavigate();
+
+  const handleNavigate = (route: string) => {
+    navigate(route);
+  };
+
   const tableRows = movements.map((element) => (
     <Table.Tr key={element.id}>
       <Table.Td>
@@ -80,10 +86,9 @@ export function RecentMovements() {
         <Text size="sm" fw={600} className="text-text-main">
           Últimas Movimentações
         </Text>
-        <UnstyledButton className="flex items-center gap-2 text-text-secondary hover:text-text-main transition-colors text-sm">
-          <FaFilter size={12} />
-          Filtrar
-        </UnstyledButton>
+        <Button variant="outline" onClick={() => handleNavigate("/movimentacoes")}>
+          Ver todas as movimentações
+        </Button>
       </Box>
 
       <Box className="overflow-x-auto">

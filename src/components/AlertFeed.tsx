@@ -1,6 +1,7 @@
-import { Badge, Box, Paper, Text, UnstyledButton } from "@mantine/core";
+import { Badge, Box, Button, Paper, Text, UnstyledButton } from "@mantine/core";
 import { FaCapsules, FaSyringe } from "react-icons/fa";
 import { GiEyedropper } from "react-icons/gi";
+import { useNavigate } from "react-router";
 
 interface AlertItem {
   id: number;
@@ -67,6 +68,12 @@ const urgencyLabels = {
 };
 
 export function AlertFeed() {
+  const navigate = useNavigate();
+
+  const handleNavigate = (route: string) => {
+    navigate(route);
+  };
+
   return (
     <Paper
       radius="lg"
@@ -112,9 +119,9 @@ export function AlertFeed() {
             </Box>
           ))}
 
-          <UnstyledButton className="text-center w-full rounded-lg text-primary">
+          <Button variant="outline" onClick={() => handleNavigate("/alertas")}>
             Ver todos os alertas
-          </UnstyledButton>
+          </Button>
         </Box>
       )}
     </Paper>
