@@ -21,8 +21,12 @@ import { Link } from "react-router";
 import { withMask } from "use-mask-input";
 import { ThemeToggle } from "../../components";
 import { type LoginRequest, loginSchema } from "../../schemas/auth";
+import { useAuthStore } from "../../stores/auth";
 
 const LoginPage = () => {
+  const { login, isLoading } = useAuthStore();
+  const rememberMe = localStorage.getItem("rememberMe");
+
   const {
     register,
     handleSubmit,
@@ -30,14 +34,14 @@ const LoginPage = () => {
   } = useForm<LoginRequest>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      cpf: "",
+      credential: rememberMe ? JSON.parse(rememberMe).credential : "",
       password: "",
-      rememberMe: false,
+      rememberMe: rememberMe ? JSON.parse(rememberMe).rememberMe : false,
     },
   });
 
   const onSubmit = (data: LoginRequest) => {
-    console.log("Login Data:", data);
+    login(data);
   };
 
   return (
@@ -82,9 +86,9 @@ const LoginPage = () => {
                   leftSection={<FaUser size={14} />}
                   radius="md"
                   size="md"
-                  {...register("cpf")}
+                  {...register("credential")}
                   ref={(element) => {
-                    register("cpf").ref(element);
+                    register("credential").ref(element);
 
                     if (element) {
                       withMask("999.999.999-99")(element);
@@ -94,7 +98,7 @@ const LoginPage = () => {
                     input: "bg-surface text-text-main border-border focus:border-primary",
                     label: "text-text-main",
                   }}
-                  error={errors.cpf?.message}
+                  error={errors.credential?.message}
                 />
 
                 <PasswordInput
@@ -143,6 +147,7 @@ const LoginPage = () => {
                   rightSection={<FaSignInAlt />}
                   radius="md"
                   size="md"
+                  loading={isLoading}
                 >
                   Entrar
                 </Button>

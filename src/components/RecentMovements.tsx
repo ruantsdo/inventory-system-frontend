@@ -86,7 +86,7 @@ export function RecentMovements() {
         </UnstyledButton>
       </Box>
 
-      <Box className="hidden md:block overflow-x-auto">
+      <Box className="overflow-x-auto">
         <Table striped highlightOnHover>
           <Table.Thead>
             <Table.Tr>

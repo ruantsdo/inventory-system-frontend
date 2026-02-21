@@ -4,28 +4,12 @@ import { AlertFeed } from "../../components/AlertFeed";
 import { ConsumptionChart } from "../../components/ConsumptionChart";
 import { RecentMovements } from "../../components/RecentMovements";
 import { StatCard } from "../../components/StatCard";
-
-function getGreeting(): string {
-  const hour = new Date().getHours();
-  if (hour < 12) return "Bom dia";
-  if (hour < 18) return "Boa tarde";
-  return "Boa noite";
-}
-
-function getFormattedDate(): string {
-  return new Date().toLocaleDateString("pt-BR", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-const userName = "Ricardo";
+import { useAuthStore } from "../../stores/auth";
+import { useTimingStore } from "../../stores/utils";
 
 const HomePage = () => {
-  const greeting = getGreeting();
-  const formattedDate = getFormattedDate();
+  const { user } = useAuthStore();
+  const { greeting, formattedDate } = useTimingStore();
 
   return (
     <Box className="max-w-7xl mx-auto space-y-6">
@@ -35,8 +19,8 @@ const HomePage = () => {
             Visão Geral do Estoque
           </Text>
           <Text size="sm" className="text-text-secondary mt-1">
-            {greeting}, {userName}! Aqui está o resumo de hoje,{" "}
-            <span className="font-medium text-text-main">{formattedDate}</span>.
+            {greeting()}, {user?.name}! Aqui está o resumo de hoje,{" "}
+            <span className="font-medium text-text-main">{formattedDate()}</span>.
           </Text>
         </Box>
         <Box className="flex items-center gap-3">

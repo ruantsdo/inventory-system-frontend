@@ -7,8 +7,11 @@ import { MdEmail } from "react-icons/md";
 import { withMask } from "use-mask-input";
 import { ThemeToggle } from "../../components";
 import { type ForgotPasswordRequest, forgotPasswordSchema } from "../../schemas/auth";
+import { useAuthStore } from "../../stores/auth";
 
 const ForgotPasswordPage = () => {
+  const { forgotPassword, isLoading } = useAuthStore();
+
   const {
     register,
     handleSubmit,
@@ -23,7 +26,7 @@ const ForgotPasswordPage = () => {
   });
 
   const onSubmit = (data: ForgotPasswordRequest) => {
-    console.log("Forgot Password Data:", data);
+    forgotPassword(data);
   };
 
   return (
@@ -121,6 +124,7 @@ const ForgotPasswordPage = () => {
                   className="bg-primary hover:bg-primary/90 text-primary-foreground"
                   radius="md"
                   size="md"
+                  loading={isLoading}
                 >
                   Solicitar redefinição de senha
                 </Button>
