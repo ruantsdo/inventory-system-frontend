@@ -1,4 +1,4 @@
-import { Badge, Box, Button, Paper, Text, UnstyledButton } from "@mantine/core";
+import { Badge, Box, Button, Paper, Text } from "@mantine/core";
 import { FaCapsules, FaSyringe } from "react-icons/fa";
 import { GiEyedropper } from "react-icons/gi";
 import { useNavigate } from "react-router";
