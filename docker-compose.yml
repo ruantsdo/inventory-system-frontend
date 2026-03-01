@@ -1,0 +1,30 @@
+services:
+  # Desenvolvimento: Vite dev server com HMR via polling (funciona no Windows)
+  # Uso: docker compose --profile dev up
+  frontend-dev:
+    image: node:22-alpine
+    container_name: inventory-frontend-dev
+    working_dir: /app
+    volumes:
+      - .:/app              # monta todo o projeto
+      - /app/node_modules   # preserva node_modules do container (não sobrescreve)
+    ports:
+      - "3000:5173"
+    command: sh -c "npm ci && npm run dev -- --host"
+    environment:
+      - NODE_ENV=development
+      - CHOKIDAR_USEPOLLING=true   # necessário no Windows para HMR detectar mudanças
+      - CHOKIDAR_INTERVAL=500
+    profiles: [dev]
+
+  # Produção: build estático servido por Nginx
+  # Uso: docker compose --profile prod up --build
+  frontend-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: inventory-frontend
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    profiles: [prod]

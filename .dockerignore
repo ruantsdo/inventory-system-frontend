@@ -1,0 +1,28 @@
+# Dependências
+node_modules
+
+# Build artifacts e cache
+dist
+.vite
+
+# Arquivos de ambiente locais
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor
+.vscode
+.idea
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
