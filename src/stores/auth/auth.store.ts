@@ -38,14 +38,6 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           const message = error instanceof Error ? error.message : "Erro inesperado";
 
-          notifications.show({
-            title: message,
-            message: "Verifique suas credenciais e tente novamente.",
-            color: "var(--status-error)",
-            position: "bottom-center",
-            autoClose: 10000,
-          });
-
           set({ errorMessage: message });
         } finally {
           set({ isLoading: false });
@@ -109,13 +101,7 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           const message = error instanceof Error ? error.message : "Erro inesperado";
 
-          notifications.show({
-            title: message,
-            message: "O token de redefinição de senha é inválido ou expirou.",
-            color: "var(--status-error)",
-            position: "bottom-center",
-            autoClose: 10000,
-          });
+          set({ errorMessage: message });
         } finally {
           set({ isLoading: false });
         }
