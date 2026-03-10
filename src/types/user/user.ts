@@ -1,8 +1,7 @@
-import type { UserRole } from "./";
-
 export interface AuthUser {
-  uuid: string;
-  name: string;
+  id: string;
+  fullName: string;
   email: string;
-  role: UserRole;
+  role: string;
+  permissions: string[];
 }
