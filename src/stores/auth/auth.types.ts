@@ -1,4 +1,8 @@
-import type { ForgotPasswordRequest, LoginRequest, ResetPasswordRequest } from "../../schemas/auth";
+import type {
+  LoginRequest,
+  resetPasswordFirstStepRequest,
+  resetPasswordSecondStepRequest,
+} from "../../schemas/auth";
 import type { AuthUser } from "./";
 
 export interface AuthState {
@@ -9,8 +13,8 @@ export interface AuthState {
 
   login: (data: LoginRequest) => Promise<void>;
   logout: () => void;
-  setUser: (user: AuthUser) => void;
+  setUser: (user: AuthUser | null) => void;
   checkAuth: () => Promise<void>;
-  forgotPassword: (data: ForgotPasswordRequest) => Promise<void>;
-  resetPassword: (data: ResetPasswordRequest, token: string) => Promise<void>;
+  resetPasswordFirstStep: (data: resetPasswordFirstStepRequest) => Promise<void>;
+  resetPasswordSecondStep: (data: resetPasswordSecondStepRequest, token: string) => Promise<void>;
 }

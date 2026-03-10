@@ -1,39 +1,38 @@
-import type { ForgotPasswordRequest, ResetPasswordRequest } from "../../schemas/auth";
+import type {
+  resetPasswordFirstStepRequest,
+  resetPasswordSecondStepRequest,
+} from "../../schemas/auth";
 import type { AuthUser } from "../../types/user";
-import { request } from "../api.client";
+import { apiClient } from "../api.client";
 import type { LoginDTO } from "./";
 
 export const authService = {
   async login(data: LoginDTO): Promise<AuthUser> {
-    return request<AuthUser>("/auth/login", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+    const response = await apiClient.post<AuthUser>("/auth/login", data);
+    return response.data;
   },
 
-  async me(): Promise<AuthUser> {
-    return request<AuthUser>("/auth/me", {
-      method: "GET",
-    });
+  async checkSession(): Promise<AuthUser> {
+    const response = await apiClient.get<AuthUser>("/auth/check-session");
+    return response.data;
+  },
+
+  async refreshToken(): Promise<void> {
+    await apiClient.post("/auth/refresh-token");
   },
 
   async logout(): Promise<void> {
-    await request<void>("/auth/logout", {
-      method: "POST",
-    });
+    await apiClient.post("/auth/logout");
   },
 
-  async forgotPassword(data: ForgotPasswordRequest): Promise<void> {
-    return request<void>("/auth/forgot-password", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+  async resetPasswordFirstStep(data: resetPasswordFirstStepRequest): Promise<void> {
+    await apiClient.post("/auth/reset-password/first-step", data);
   },
 
-  async resetPassword(data: ResetPasswordRequest, token: string): Promise<void> {
-    return request<void>("/auth/reset-password", {
-      method: "POST",
-      body: JSON.stringify({ ...data, token }),
-    });
+  async resetPasswordSecondStep(
+    data: resetPasswordSecondStepRequest,
+    token: string,
+  ): Promise<void> {
+    await apiClient.post("/auth/reset-password/second-step", { ...data, token });
   },
 };

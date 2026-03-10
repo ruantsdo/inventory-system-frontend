@@ -1,7 +1,11 @@
 import { notifications } from "@mantine/notifications";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type { ForgotPasswordRequest, LoginRequest, ResetPasswordRequest } from "../../schemas/auth";
+import type {
+  LoginRequest,
+  resetPasswordFirstStepRequest,
+  resetPasswordSecondStepRequest,
+} from "../../schemas/auth";
 import { authService } from "../../services/auth";
 import type { AuthState, AuthUser } from "./";
 
@@ -25,10 +29,7 @@ export const useAuthStore = create<AuthState>()(
         try {
           const user = await authService.login({ credential, password });
 
-          set({
-            user,
-            hasCheckedAuth: true,
-          });
+          set({ user, hasCheckedAuth: true });
 
           if (rememberMe) {
             localStorage.setItem("rememberMe", JSON.stringify({ credential, rememberMe }));
@@ -37,7 +38,6 @@ export const useAuthStore = create<AuthState>()(
           }
         } catch (error) {
           const message = error instanceof Error ? error.message : "Erro inesperado";
-
           set({ errorMessage: message });
         } finally {
           set({ isLoading: false });
@@ -56,51 +56,47 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
 
         try {
-          const user = await authService.me();
-          set({ user });
+          const userFromServer = await authService.checkSession();
+          set({ user: userFromServer });
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Erro inesperado";
-
-          set({ user: null, errorMessage: message });
-        } finally {
-          set({
-            hasCheckedAuth: true,
-            isLoading: false,
+          set({ user: null, errorMessage: "Sessão expirada." });
+          notifications.show({
+            title: "Sessão expirada",
+            message: "A sessão expirou. Por favor, faça login novamente.",
+            color: "var(--status-warning)",
+            position: "bottom-center",
+            autoClose: 10000,
           });
+        } finally {
+          set({ hasCheckedAuth: true, isLoading: false });
         }
       },
 
       logout: async () => {
         await authService.logout();
-
-        set({
-          user: null,
-          hasCheckedAuth: true,
-        });
+        set({ user: null, hasCheckedAuth: true });
       },
 
-      forgotPassword: async (data: ForgotPasswordRequest) => {
+      resetPasswordFirstStep: async (data: resetPasswordFirstStepRequest) => {
         set({ isLoading: true, errorMessage: null });
 
         try {
-          await authService.forgotPassword(data);
+          await authService.resetPasswordFirstStep(data);
         } catch (error) {
           const message = error instanceof Error ? error.message : "Erro inesperado";
-
           set({ errorMessage: message });
         } finally {
           set({ isLoading: false });
         }
       },
 
-      resetPassword: async (data: ResetPasswordRequest, token: string) => {
+      resetPasswordSecondStep: async (data: resetPasswordSecondStepRequest, token: string) => {
         set({ isLoading: true, errorMessage: null });
 
         try {
-          await authService.resetPassword(data, token);
+          await authService.resetPasswordSecondStep(data, token);
         } catch (error) {
           const message = error instanceof Error ? error.message : "Erro inesperado";
-
           set({ errorMessage: message });
         } finally {
           set({ isLoading: false });
