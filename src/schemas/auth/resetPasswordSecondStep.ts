@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const resetPasswordSchema = z
+export const resetPasswordSecondStepSchema = z
   .object({
     newPassword: z.string().min(6, "A nova senha deve ter no mínimo 6 caracteres"),
 
@@ -11,4 +11,4 @@ export const resetPasswordSchema = z
     path: ["confirmPassword"],
   });
 
-export type ResetPasswordRequest = z.infer<typeof resetPasswordSchema>;
+export type resetPasswordSecondStepRequest = z.infer<typeof resetPasswordSecondStepSchema>;

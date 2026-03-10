@@ -5,26 +5,29 @@ import { useForm } from "react-hook-form";
 import { FaLock } from "react-icons/fa";
 import { useParams } from "react-router";
 import { ThemeToggle } from "../../components";
-import { type ResetPasswordRequest, resetPasswordSchema } from "../../schemas/auth";
+import {
+  type resetPasswordSecondStepRequest,
+  resetPasswordSecondStepSchema,
+} from "../../schemas/auth";
 import { useAuthStore } from "../../stores/auth";
 
-const ResetPasswordPage = () => {
-  const { resetPassword, isLoading } = useAuthStore();
+const ResetPasswordSecondStepPage = () => {
+  const { resetPasswordSecondStep, isLoading } = useAuthStore();
   const { token } = useParams();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ResetPasswordRequest>({
-    resolver: zodResolver(resetPasswordSchema),
+  } = useForm<resetPasswordSecondStepRequest>({
+    resolver: zodResolver(resetPasswordSecondStepSchema),
     defaultValues: {
       newPassword: "",
       confirmPassword: "",
     },
   });
 
-  const onSubmit = (data: ResetPasswordRequest) => {
+  const onSubmit = (data: resetPasswordSecondStepRequest) => {
     if (!token) {
       notifications.show({
         title: "Sem token",
@@ -38,7 +41,7 @@ const ResetPasswordPage = () => {
       return;
     }
 
-    resetPassword(data, token);
+    resetPasswordSecondStep(data, token);
   };
 
   return (
@@ -120,4 +123,4 @@ const ResetPasswordPage = () => {
   );
 };
 
-export default ResetPasswordPage;
+export default ResetPasswordSecondStepPage;

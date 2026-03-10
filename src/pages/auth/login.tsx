@@ -129,7 +129,7 @@ const LoginPage = () => {
                   />
                   <Anchor
                     component={Link}
-                    to="/forgot-password"
+                    to="/auth/reset-password-first-step"
                     size="sm"
                     fw={500}
                     style={{ textDecoration: "none" }}

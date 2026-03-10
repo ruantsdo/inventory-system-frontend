@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const forgotPasswordSchema = z.object({
+export const resetPasswordFirstStepSchema = z.object({
   cpf: z
     .string()
     .min(1, "CPF é obrigatório")
@@ -18,4 +18,4 @@ export const forgotPasswordSchema = z.object({
     }, "Formato inválido (DD/MM/AAAA)"),
 });
 
-export type ForgotPasswordRequest = z.infer<typeof forgotPasswordSchema>;
+export type resetPasswordFirstStepRequest = z.infer<typeof resetPasswordFirstStepSchema>;

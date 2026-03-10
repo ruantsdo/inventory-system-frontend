@@ -6,18 +6,21 @@ import { FaCalendar, FaUser } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import { withMask } from "use-mask-input";
 import { ThemeToggle } from "../../components";
-import { type ForgotPasswordRequest, forgotPasswordSchema } from "../../schemas/auth";
+import {
+  type resetPasswordFirstStepRequest,
+  resetPasswordFirstStepSchema,
+} from "../../schemas/auth";
 import { useAuthStore } from "../../stores/auth";
 
-const ForgotPasswordPage = () => {
-  const { forgotPassword, isLoading } = useAuthStore();
+const ResetPasswordFirstStepPage = () => {
+  const { resetPasswordFirstStep, isLoading } = useAuthStore();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ForgotPasswordRequest>({
-    resolver: zodResolver(forgotPasswordSchema),
+  } = useForm<resetPasswordFirstStepRequest>({
+    resolver: zodResolver(resetPasswordFirstStepSchema),
     defaultValues: {
       cpf: "",
       email: "",
@@ -25,8 +28,8 @@ const ForgotPasswordPage = () => {
     },
   });
 
-  const onSubmit = (data: ForgotPasswordRequest) => {
-    forgotPassword(data);
+  const onSubmit = (data: resetPasswordFirstStepRequest) => {
+    resetPasswordFirstStep(data);
   };
 
   return (
@@ -137,4 +140,4 @@ const ForgotPasswordPage = () => {
   );
 };
 
-export default ForgotPasswordPage;
+export default ResetPasswordFirstStepPage;
