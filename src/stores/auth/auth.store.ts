@@ -3,8 +3,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type {
   LoginRequest,
-  resetPasswordFirstStepRequest,
-  resetPasswordSecondStepRequest,
+  ResetPasswordFirstStepRequest,
+  ResetPasswordSecondStepRequest,
 } from "../../schemas/auth";
 import { authService } from "../../services/auth";
 import type { AuthState, AuthUser } from "./";
@@ -37,7 +37,17 @@ export const useAuthStore = create<AuthState>()(
             localStorage.removeItem("rememberMe");
           }
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Erro inesperado";
+          const message = error instanceof Error ? error.message : "Credenciais inválidas";
+
+          notifications.show({
+            title: "Erro ao fazer login",
+            message: message,
+            color: "var(--status-error)",
+            position: "bottom-center",
+            autoClose: false,
+            withCloseButton: true,
+          });
+
           set({ errorMessage: message });
         } finally {
           set({ isLoading: false });
@@ -58,8 +68,8 @@ export const useAuthStore = create<AuthState>()(
         try {
           const userFromServer = await authService.checkSession();
           set({ user: userFromServer });
-        } catch (error) {
-          set({ user: null, errorMessage: "Sessão expirada." });
+        } catch {
+          set({ user: null, errorMessage: null });
           notifications.show({
             title: "Sessão expirada",
             message: "A sessão expirou. Por favor, faça login novamente.",
@@ -73,31 +83,68 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: async () => {
-        await authService.logout();
-        set({ user: null, hasCheckedAuth: true });
+        try {
+          await authService.logout();
+        } catch {
+          notifications.show({
+            title: "Erro ao sair",
+            message:
+              "Não foi possível encerrar a sessão no servidor. Você foi desconectado localmente.",
+            color: "var(--status-warning)",
+            position: "bottom-center",
+            autoClose: 8000,
+          });
+        } finally {
+          set({ user: null, hasCheckedAuth: true, errorMessage: null });
+        }
       },
 
-      resetPasswordFirstStep: async (data: resetPasswordFirstStepRequest) => {
+      resetPasswordFirstStep: async (data: ResetPasswordFirstStepRequest) => {
         set({ isLoading: true, errorMessage: null });
 
         try {
           await authService.resetPasswordFirstStep(data);
+
+          notifications.show({
+            title: "Código enviado",
+            message: "O link de recuperação foi enviado para o seu e-mail.",
+            color: "var(--status-success)",
+            position: "bottom-center",
+            autoClose: false,
+            withCloseButton: true,
+          });
+
+          return true;
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Erro inesperado";
+          const message =
+            error instanceof Error ? error.message : "Tente novamente em alguns instantes.";
+
+          notifications.show({
+            title: "Erro ao enviar código",
+            message: message,
+            color: "var(--status-error)",
+            position: "bottom-center",
+            autoClose: 10000,
+          });
           set({ errorMessage: message });
+
+          return false;
         } finally {
           set({ isLoading: false });
         }
       },
 
-      resetPasswordSecondStep: async (data: resetPasswordSecondStepRequest, token: string) => {
+      resetPasswordSecondStep: async (data: ResetPasswordSecondStepRequest, token: string) => {
         set({ isLoading: true, errorMessage: null });
 
         try {
           await authService.resetPasswordSecondStep(data, token);
+          return true;
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Erro inesperado";
+          const message =
+            error instanceof Error ? error.message : "Erro inesperado ao redefinir senha.";
           set({ errorMessage: message });
+          return false;
         } finally {
           set({ isLoading: false });
         }
