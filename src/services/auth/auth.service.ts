@@ -1,6 +1,6 @@
 import type {
-  resetPasswordFirstStepRequest,
-  resetPasswordSecondStepRequest,
+  ResetPasswordFirstStepRequest,
+  ResetPasswordSecondStepRequest,
 } from "../../schemas/auth";
 import type { AuthUser } from "../../types/user";
 import { apiClient } from "../api.client";
@@ -25,12 +25,12 @@ export const authService = {
     await apiClient.post("/auth/logout");
   },
 
-  async resetPasswordFirstStep(data: resetPasswordFirstStepRequest): Promise<void> {
+  async resetPasswordFirstStep(data: ResetPasswordFirstStepRequest): Promise<void> {
     await apiClient.post("/auth/reset-password/first-step", data);
   },
 
   async resetPasswordSecondStep(
-    data: resetPasswordSecondStepRequest,
+    data: ResetPasswordSecondStepRequest,
     token: string,
   ): Promise<void> {
     await apiClient.post("/auth/reset-password/second-step", { ...data, token });
