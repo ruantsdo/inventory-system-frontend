@@ -1,25 +1,37 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Button, Container, Paper, Stack, Text, TextInput, Title } from "@mantine/core";
-
+import {
+  Anchor,
+  Box,
+  Button,
+  Container,
+  Paper,
+  Stack,
+  Text,
+  TextInput,
+  Title,
+} from "@mantine/core";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaCalendar, FaUser } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
+import { Link } from "react-router";
 import { withMask } from "use-mask-input";
 import { ThemeToggle } from "../../components";
 import {
-  type resetPasswordFirstStepRequest,
+  type ResetPasswordFirstStepRequest,
   resetPasswordFirstStepSchema,
 } from "../../schemas/auth";
 import { useAuthStore } from "../../stores/auth";
 
 const ResetPasswordFirstStepPage = () => {
   const { resetPasswordFirstStep, isLoading } = useAuthStore();
+  const [lockSubmit, setLockSubmit] = useState<boolean>(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<resetPasswordFirstStepRequest>({
+  } = useForm<ResetPasswordFirstStepRequest>({
     resolver: zodResolver(resetPasswordFirstStepSchema),
     defaultValues: {
       cpf: "",
@@ -28,8 +40,12 @@ const ResetPasswordFirstStepPage = () => {
     },
   });
 
-  const onSubmit = (data: resetPasswordFirstStepRequest) => {
-    resetPasswordFirstStep(data);
+  const onSubmit = async (data: ResetPasswordFirstStepRequest) => {
+    const success: boolean = await resetPasswordFirstStep(data);
+
+    if (success) {
+      setLockSubmit(true);
+    }
   };
 
   return (
@@ -128,9 +144,26 @@ const ResetPasswordFirstStepPage = () => {
                   radius="md"
                   size="md"
                   loading={isLoading}
+                  disabled={lockSubmit}
                 >
-                  Solicitar redefinição de senha
+                  {isLoading
+                    ? "Aguarde..."
+                    : lockSubmit
+                      ? "Link de redefinição enviado!"
+                      : "Solicitar redefinição de senha"}
                 </Button>
+
+                <Anchor
+                  component={Link}
+                  to="/login"
+                  size="sm"
+                  fw={500}
+                  ta="center"
+                  style={{ textDecoration: "none" }}
+                  className="text-primary hover:text-primary/80"
+                >
+                  Voltar para o login
+                </Anchor>
               </Stack>
             </form>
           </Box>

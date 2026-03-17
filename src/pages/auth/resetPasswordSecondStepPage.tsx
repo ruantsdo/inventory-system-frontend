@@ -1,25 +1,28 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, Container, Paper, PasswordInput, Stack, Text, Title } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaLock } from "react-icons/fa";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { ThemeToggle } from "../../components";
 import {
-  type resetPasswordSecondStepRequest,
+  type ResetPasswordSecondStepRequest,
   resetPasswordSecondStepSchema,
 } from "../../schemas/auth";
 import { useAuthStore } from "../../stores/auth";
 
 const ResetPasswordSecondStepPage = () => {
+  const navigate = useNavigate();
   const { resetPasswordSecondStep, isLoading } = useAuthStore();
   const { token } = useParams();
+  const [lockSubmit, setLockSubmit] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<resetPasswordSecondStepRequest>({
+  } = useForm<ResetPasswordSecondStepRequest>({
     resolver: zodResolver(resetPasswordSecondStepSchema),
     defaultValues: {
       newPassword: "",
@@ -27,21 +30,46 @@ const ResetPasswordSecondStepPage = () => {
     },
   });
 
-  const onSubmit = (data: resetPasswordSecondStepRequest) => {
+  const onSubmit = async (data: ResetPasswordSecondStepRequest) => {
     if (!token) {
       notifications.show({
-        title: "Sem token",
-        message:
-          "Para redefinir sua senha, por favor, use o link de redefinição enviado para o seu e-mail.",
+        title: "Link inválido",
+        message: "Para redefinir sua senha, use o link de redefinição enviado para o seu e-mail.",
         color: "var(--status-error)",
         position: "bottom-center",
-        autoClose: 10000,
+        autoClose: false,
+        withCloseButton: true,
       });
 
       return;
     }
 
-    resetPasswordSecondStep(data, token);
+    const success = await resetPasswordSecondStep(data, token);
+
+    if (success) {
+      setLockSubmit(true);
+
+      const resetPasswordNotificationId = notifications.show({
+        title: "Senha redefinida!",
+        message: "Vamos redirecioná-lo para a página de login.",
+        color: "var(--status-success)",
+        position: "bottom-center",
+        autoClose: false,
+      });
+
+      setTimeout(() => {
+        navigate("/login");
+
+        notifications.update({
+          id: resetPasswordNotificationId,
+          title: "Senha atualizada!",
+          message: "Agora você pode fazer login com sua nova senha!",
+          color: "var(--status-success)",
+          position: "bottom-center",
+          autoClose: 10000,
+        });
+      }, 5000);
+    }
   };
 
   return (
@@ -111,8 +139,9 @@ const ResetPasswordSecondStepPage = () => {
                   radius="md"
                   size="md"
                   loading={isLoading}
+                  disabled={lockSubmit}
                 >
-                  Redefinir senha
+                  {isLoading ? "Aguarde..." : lockSubmit ? "Senha redefinida!" : "Redefinir senha"}
                 </Button>
               </Stack>
             </form>
