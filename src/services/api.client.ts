@@ -1,10 +1,12 @@
 import { notifications } from "@mantine/notifications";
+import type { InternalAxiosRequestConfig } from "axios";
 import axios from "axios";
 
 export interface ApiError {
   status: number;
   message: string;
   title?: string;
+  code?: string;
 }
 
 let isRefreshing = false;
@@ -24,6 +26,62 @@ function flushQueue(error: unknown = null) {
   pendingQueue = [];
 }
 
+const SKIP_REFRESH_URLS = ["/auth/login", "/auth/refresh-token", "/auth/reset-password"];
+
+const shouldSkipRefresh = (url?: string): boolean => {
+  if (!url) return false;
+  return SKIP_REFRESH_URLS.some((skip) => url.includes(skip));
+};
+
+const SILENT_ERROR_URLS = ["/auth/login", "/auth/check-session"];
+
+const isSilentError = (url?: string): boolean => {
+  if (!url) return false;
+  return SILENT_ERROR_URLS.some((silent) => url.includes(silent));
+};
+
+async function handleRefreshFlow(originalRequest: InternalAxiosRequestConfig) {
+  if (isRefreshing) {
+    return new Promise((resolve, reject) => {
+      pendingQueue.push({
+        resolve: () => resolve(apiClient(originalRequest)),
+        reject,
+      });
+    });
+  }
+
+  isRefreshing = true;
+
+  try {
+    await apiClient.post("/auth/refresh-token");
+    flushQueue();
+    return apiClient(originalRequest);
+  } catch (refreshError) {
+    flushQueue(refreshError);
+
+    const { useAuthStore } = await import("../stores/auth");
+    useAuthStore.getState().setUser(null);
+
+    if (window.location.pathname !== "/login") {
+      window.location.href = "/login";
+    }
+
+    return Promise.reject(refreshError);
+  } finally {
+    isRefreshing = false;
+  }
+}
+
+function showErrorNotification(errorData: ApiError | undefined) {
+  notifications.show({
+    title: errorData?.title ?? "Erro na requisição",
+    message: errorData?.message ?? "Ocorreu um erro. Tente novamente.",
+    color: "var(--status-error)",
+    position: "bottom-center",
+    autoClose: 10000,
+  });
+}
+
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   withCredentials: true,
@@ -34,53 +92,36 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-    const errorData = error.response?.data;
+    const errorData: ApiError = error.response?.data;
+    const status: number = error.response?.status;
+    const requestUrl: string = originalRequest?.url;
 
-    if (
-      error.response?.status !== 401 ||
-      originalRequest._retry ||
-      errorData?.code === "INVALID_CREDENTIALS" ||
-      originalRequest.url?.includes("/auth/login")
-    ) {
+    const is401 = status === 401;
+    const alreadyRetried = !!originalRequest._retry;
+
+    if (is401 && !alreadyRetried && !shouldSkipRefresh(requestUrl)) {
+      originalRequest._retry = true;
+      return handleRefreshFlow(originalRequest);
+    }
+
+    if (is401 && requestUrl?.includes("/auth/reset-password/second-step")) {
       notifications.show({
-        title: errorData?.title,
-        message: errorData?.message ?? "Erro na requisição",
-        color: "var(--status-error)",
+        title: "Link expirado ou inválido",
+        message:
+          "O link de redefinição de senha expirou ou é inválido. Use o link enviado para o seu e-mail para redefinir sua senha.",
+        color: "var(--status-warning)",
         position: "bottom-center",
-        autoClose: 10000,
+        autoClose: false,
+        withCloseButton: true,
       });
-      return Promise.reject(error);
+      return Promise.reject(new Error("Link de redefinição de senha inválido ou expirado."));
     }
 
-    originalRequest._retry = true;
-
-    if (isRefreshing) {
-      return new Promise((resolve, reject) => {
-        pendingQueue.push({
-          resolve: () => resolve(apiClient(originalRequest)),
-          reject,
-        });
-      });
+    if (!isSilentError(requestUrl)) {
+      showErrorNotification(errorData);
     }
 
-    isRefreshing = true;
-
-    try {
-      await apiClient.post("/auth/refresh-token");
-      flushQueue();
-      return apiClient(originalRequest);
-    } catch (refreshError) {
-      flushQueue(refreshError);
-
-      const { useAuthStore } = await import("../stores/auth");
-      useAuthStore.getState().setUser(null);
-      if (window.location.pathname !== "/login") {
-        window.location.href = "/login";
-      }
-
-      return Promise.reject(refreshError);
-    } finally {
-      isRefreshing = false;
-    }
+    const message = errorData?.message ?? "Erro inesperado";
+    return Promise.reject(new Error(message));
   },
 );
