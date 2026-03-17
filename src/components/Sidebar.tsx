@@ -43,12 +43,6 @@ const navItems: NavItem[] = [
   },
 ];
 
-const mockUser = {
-  name: "Ricardo Silva",
-  role: "Gestor de Estoque",
-  avatar: null as string | null,
-};
-
 interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
@@ -58,7 +52,7 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: SidebarProps) {
   const [activeItem, setActiveItem] = useState("/dashboard");
-  const logout = useAuthStore((state) => state.logout);
+  const { logout, user } = useAuthStore();
 
   const isCollapsed = collapsed && !mobileOpen;
 
@@ -242,32 +236,35 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
             <ThemeToggle iconOnly={isCollapsed} />
           </Box>
           <Box
-            className={`flex items-center gap-3 py-2 rounded-lg ${isCollapsed ? "justify-center" : "px-3"}`}
+            className={`flex ${isCollapsed ? "flex-col" : "flex-row"} items-center gap-3 py-2 rounded-lg ${isCollapsed ? "justify-center" : "px-3"}`}
           >
             <Avatar
-              src={mockUser.avatar}
-              size={isCollapsed ? "sm" : "md"}
+              key={user?.fullName}
+              name={user?.fullName}
+              color="initials"
+              size={isCollapsed ? 32 : 38}
               radius="xl"
-              color="green"
-            >
-              {mockUser.name
-                .split(" ")
-                .map((n) => n[0])
-                .join("")}
-            </Avatar>
+            />
+            {isCollapsed && (
+              <Tooltip label="Sair" position="top" withArrow>
+                <ActionIcon variant="subtle" color="red" size="md" radius="md" onClick={logout}>
+                  <FaSignOutAlt size={16} />
+                </ActionIcon>
+              </Tooltip>
+            )}
             {!isCollapsed && (
               <>
                 <Box className="min-w-0 flex-1">
                   <Text size="sm" fw={600} className="text-text-main truncate">
-                    {mockUser.name}
+                    {user?.fullName}
                   </Text>
                   <Text size="xs" className="text-text-secondary truncate">
-                    {mockUser.role}
+                    {user?.role}
                   </Text>
                 </Box>
                 <Tooltip label="Sair" position="top" withArrow>
                   <ActionIcon variant="subtle" color="red" size="md" radius="md" onClick={logout}>
-                    <FaSignOutAlt size={14} />
+                    <FaSignOutAlt size={16} />
                   </ActionIcon>
                 </Tooltip>
               </>
