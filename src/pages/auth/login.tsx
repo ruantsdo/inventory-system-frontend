@@ -14,18 +14,40 @@ import {
   ThemeIcon,
   Title,
 } from "@mantine/core";
-
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { FaLock, FaPlus, FaSignInAlt, FaUser } from "react-icons/fa";
-import { Link } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { withMask } from "use-mask-input";
 import { ThemeToggle } from "../../components";
 import { type LoginRequest, loginSchema } from "../../schemas/auth";
-import { useAuthStore } from "../../stores/auth";
+import { selectIsAuthenticated, selectIsLoading, useAuthStore } from "../../stores/auth";
 
 const LoginPage = () => {
-  const { login, isLoading } = useAuthStore();
-  const rememberMe = localStorage.getItem("rememberMe");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const login = useAuthStore((s) => s.login);
+  const isLoading = useAuthStore(selectIsLoading);
+  const isAuthenticated = useAuthStore(selectIsAuthenticated);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? "/";
+      navigate(from, { replace: true });
+    }
+  }, [isAuthenticated, navigate, location.state]);
+
+  const getSavedRememberMe = () => {
+    try {
+      const raw = localStorage.getItem("rememberMe");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      localStorage.removeItem("rememberMe");
+      return null;
+    }
+  };
+
+  const savedData = getSavedRememberMe();
 
   const {
     register,
@@ -34,9 +56,9 @@ const LoginPage = () => {
   } = useForm<LoginRequest>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      credential: rememberMe ? JSON.parse(rememberMe).credential : "",
+      credential: savedData?.credential ?? "",
       password: "",
-      rememberMe: rememberMe ? JSON.parse(rememberMe).rememberMe : false,
+      rememberMe: savedData?.rememberMe ?? false,
     },
   });
 
@@ -71,7 +93,7 @@ const LoginPage = () => {
                   Sistema de Gestão
                 </Title>
                 <Text size="xs" ta="center" fw={500} mt={4} className="text-primary">
-                  Inventário & Controle de Estoque
+                  Inventário &amp; Controle de Estoque
                 </Text>
               </Box>
             </Stack>
