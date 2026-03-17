@@ -4,5 +4,5 @@ import { LogingPage, ResetPasswordFirstStepPage, ResetPasswordSecondStepPage } f
 export const authRoutes: RouteObject[] = [
   { path: "/login", element: <LogingPage /> },
   { path: "/auth/reset-password-first-step", element: <ResetPasswordFirstStepPage /> },
-  { path: "/auth/reset-password-second-step:token", element: <ResetPasswordSecondStepPage /> },
+  { path: "/auth/reset-password-second-step/:token", element: <ResetPasswordSecondStepPage /> },
 ];
