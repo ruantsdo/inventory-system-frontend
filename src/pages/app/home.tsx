@@ -19,7 +19,7 @@ const HomePage = () => {
             Visão Geral do Estoque
           </Text>
           <Text size="sm" className="text-text-secondary mt-1">
-            {greeting()}, {user?.name}! Aqui está o resumo de hoje,{" "}
+            {greeting()}, {user?.fullName}! Aqui está o resumo de hoje,{" "}
             <span className="font-medium text-text-main">{formattedDate()}</span>.
           </Text>
         </Box>
