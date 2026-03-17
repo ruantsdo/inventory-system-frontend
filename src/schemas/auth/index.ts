@@ -1,18 +1,18 @@
 import { type LoginRequest, loginSchema } from "./login";
 import {
-  type resetPasswordFirstStepRequest,
+  type ResetPasswordFirstStepRequest,
   resetPasswordFirstStepSchema,
 } from "./resetPasswordFirstStep";
 import {
-  type resetPasswordSecondStepRequest,
+  type ResetPasswordSecondStepRequest,
   resetPasswordSecondStepSchema,
 } from "./resetPasswordSecondStep";
 
 export {
+  loginSchema,
   resetPasswordFirstStepSchema,
   resetPasswordSecondStepSchema,
-  loginSchema,
   type LoginRequest,
-  type resetPasswordFirstStepRequest,
-  type resetPasswordSecondStepRequest,
+  type ResetPasswordFirstStepRequest,
+  type ResetPasswordSecondStepRequest,
 };

@@ -18,4 +18,4 @@ export const resetPasswordFirstStepSchema = z.object({
     }, "Formato inválido (DD/MM/AAAA)"),
 });
 
-export type resetPasswordFirstStepRequest = z.infer<typeof resetPasswordFirstStepSchema>;
+export type ResetPasswordFirstStepRequest = z.infer<typeof resetPasswordFirstStepSchema>;
