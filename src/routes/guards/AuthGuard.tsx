@@ -1,14 +1,19 @@
-import { Navigate, Outlet } from "react-router";
+import { Navigate, Outlet, useLocation } from "react-router";
 import { LoaderPage } from "../../pages/public";
 import { selectHasCheckedAuth, selectIsAuthenticated, useAuthStore } from "../../stores/auth";
 
 export const AuthGuard = () => {
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
   const hasCheckedAuth = useAuthStore(selectHasCheckedAuth);
+  const location = useLocation();
 
   if (!hasCheckedAuth) {
     return <LoaderPage />;
   }
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return <Outlet />;
 };
