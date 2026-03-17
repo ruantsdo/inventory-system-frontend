@@ -1,4 +1,4 @@
-import type { AuthUser, UserRole } from "../../types/user";
+import type { AuthUser } from "../../types/user";
 import {
   selectErrorMessage,
   selectHasCheckedAuth,
@@ -17,4 +17,4 @@ export {
   selectUser,
   selectErrorMessage,
 };
-export type { AuthState, AuthUser, UserRole };
+export type { AuthState, AuthUser };
