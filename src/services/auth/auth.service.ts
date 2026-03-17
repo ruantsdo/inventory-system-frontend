@@ -8,8 +8,8 @@ import type { LoginDTO } from "./";
 
 export const authService = {
   async login(data: LoginDTO): Promise<AuthUser> {
-    const response = await apiClient.post<AuthUser>("/auth/login", data);
-    return response.data;
+    const response = await apiClient.post("/auth/login", data);
+    return response.data.user as AuthUser;
   },
 
   async checkSession(): Promise<AuthUser> {

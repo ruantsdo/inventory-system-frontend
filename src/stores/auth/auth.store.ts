@@ -67,7 +67,16 @@ export const useAuthStore = create<AuthState>()(
 
         try {
           const userFromServer = await authService.checkSession();
-          set({ user: userFromServer });
+
+          set({
+            user: {
+              fullName: persistedUser.fullName,
+              email: persistedUser.email,
+              id: userFromServer.id,
+              role: userFromServer.role,
+              permissions: userFromServer.permissions,
+            },
+          });
         } catch {
           set({ user: null, errorMessage: null });
           notifications.show({
