@@ -1,4 +1,5 @@
 import { notifications } from "@mantine/notifications";
+import CryptoJS from "crypto-js";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type {
@@ -32,10 +33,16 @@ export const useAuthStore = create<AuthState>()(
           set({ user, hasCheckedAuth: true });
 
           if (rememberMe) {
-            localStorage.setItem("rememberMe", JSON.stringify({ credential, rememberMe }));
+            const encryptedParams = CryptoJS.AES.encrypt(
+              JSON.stringify({ credential, rememberMe }),
+              import.meta.env.VITE_STORAGE_SECRET || "inventory-system-secret-key",
+            ).toString();
+            localStorage.setItem("rememberMe", encryptedParams);
           } else {
             localStorage.removeItem("rememberMe");
           }
+
+          notifications.clean();
         } catch (error) {
           const message = error instanceof Error ? error.message : "Credenciais inválidas";
 
