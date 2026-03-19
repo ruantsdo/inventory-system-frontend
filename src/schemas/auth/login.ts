@@ -9,7 +9,7 @@ export const loginSchema = z.object({
       message: "CPF incompleto",
     }),
 
-  password: z.string().min(4, "Senha obrigatória"),
+  password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
   rememberMe: z.boolean(),
 });
 

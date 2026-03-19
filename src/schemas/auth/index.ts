@@ -1,12 +1,18 @@
-import { type ForgotPasswordRequest, forgotPasswordSchema } from "./forgotPassword";
 import { type LoginRequest, loginSchema } from "./login";
-import { type ResetPasswordRequest, resetPasswordSchema } from "./resetPassword";
+import {
+  type ResetPasswordFirstStepRequest,
+  resetPasswordFirstStepSchema,
+} from "./resetPasswordFirstStep";
+import {
+  type ResetPasswordSecondStepRequest,
+  resetPasswordSecondStepSchema,
+} from "./resetPasswordSecondStep";
 
 export {
-  forgotPasswordSchema,
-  resetPasswordSchema,
   loginSchema,
+  resetPasswordFirstStepSchema,
+  resetPasswordSecondStepSchema,
   type LoginRequest,
-  type ForgotPasswordRequest,
-  type ResetPasswordRequest,
+  type ResetPasswordFirstStepRequest,
+  type ResetPasswordSecondStepRequest,
 };

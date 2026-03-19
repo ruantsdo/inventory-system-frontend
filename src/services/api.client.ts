@@ -1,41 +1,127 @@
-const API_URL = import.meta.env.VITE_API_URL;
-
 import { notifications } from "@mantine/notifications";
+import type { InternalAxiosRequestConfig } from "axios";
+import axios from "axios";
 
-interface ApiError {
+export interface ApiError {
   status: number;
   message: string;
   title?: string;
+  code?: string;
 }
 
-async function request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-  const response = await fetch(`${API_URL}${endpoint}`, {
-    credentials: "include",
-    headers: { "Content-Type": "application/json", ...options.headers },
-    ...options,
+let isRefreshing = false;
+let pendingQueue: Array<{
+  resolve: () => void;
+  reject: (error: unknown) => void;
+}> = [];
+
+function flushQueue(error: unknown = null) {
+  pendingQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve();
+    }
   });
+  pendingQueue = [];
+}
 
-  if (!response.ok) {
-    const errorBody = await response.json().catch(() => null);
-    const error: ApiError = {
-      status: response.status,
-      message: errorBody?.message ?? "Erro na requisição",
-      title: errorBody?.title,
-    };
+const SKIP_REFRESH_URLS = ["/auth/login", "/auth/refresh-token", "/auth/reset-password"];
 
-    notifications.show({
-      title: error.title,
-      message: error.message,
-      color: "var(--status-error)",
-      position: "bottom-center",
-      autoClose: 10000,
+const shouldSkipRefresh = (url?: string): boolean => {
+  if (!url) return false;
+  return SKIP_REFRESH_URLS.some((skip) => url.includes(skip));
+};
+
+const SILENT_ERROR_URLS = ["/auth/login", "/auth/check-session"];
+
+const isSilentError = (url?: string): boolean => {
+  if (!url) return false;
+  return SILENT_ERROR_URLS.some((silent) => url.includes(silent));
+};
+
+async function handleRefreshFlow(originalRequest: InternalAxiosRequestConfig) {
+  if (isRefreshing) {
+    return new Promise((resolve, reject) => {
+      pendingQueue.push({
+        resolve: () => resolve(apiClient(originalRequest)),
+        reject,
+      });
     });
-
-    throw error;
   }
 
-  return response.json() as Promise<T>;
+  isRefreshing = true;
+
+  try {
+    await apiClient.post("/auth/refresh-token");
+    flushQueue();
+    return apiClient(originalRequest);
+  } catch (refreshError) {
+    flushQueue(refreshError);
+
+    const { useAuthStore } = await import("../stores/auth");
+    useAuthStore.getState().setUser(null);
+
+    if (window.location.pathname !== "/login") {
+      window.location.href = "/login";
+    }
+
+    return Promise.reject(refreshError);
+  } finally {
+    isRefreshing = false;
+  }
 }
 
-export { request };
-export type { ApiError };
+function showErrorNotification(errorData: ApiError | undefined) {
+  notifications.show({
+    title: errorData?.title ?? "Erro na requisição",
+    message: errorData?.message ?? "Ocorreu um erro. Tente novamente.",
+    color: "var(--status-error)",
+    position: "bottom-center",
+    autoClose: 10000,
+  });
+}
+
+export const apiClient = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
+  headers: { "Content-Type": "application/json" },
+});
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    const errorData: ApiError = error.response?.data;
+    const status: number = error.response?.status;
+    const requestUrl: string = originalRequest?.url;
+
+    const is401 = status === 401;
+    const alreadyRetried = !!originalRequest._retry;
+
+    if (is401 && !alreadyRetried && !shouldSkipRefresh(requestUrl)) {
+      originalRequest._retry = true;
+      return handleRefreshFlow(originalRequest);
+    }
+
+    if (is401 && requestUrl?.includes("/auth/reset-password/second-step")) {
+      notifications.show({
+        title: "Link expirado ou inválido",
+        message:
+          "O link de redefinição de senha expirou ou é inválido. Use o link enviado para o seu e-mail para redefinir sua senha.",
+        color: "var(--status-warning)",
+        position: "bottom-center",
+        autoClose: false,
+        withCloseButton: true,
+      });
+      return Promise.reject(new Error("Link de redefinição de senha inválido ou expirado."));
+    }
+
+    if (!isSilentError(requestUrl)) {
+      showErrorNotification(errorData);
+    }
+
+    const message = errorData?.message ?? "Erro inesperado";
+    return Promise.reject(new Error(message));
+  },
+);

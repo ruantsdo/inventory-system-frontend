@@ -1,5 +1,5 @@
-import ForgotPasswordPage from "./forgotPassword";
 import LogingPage from "./login";
-import ResetPasswordPage from "./resetPassword";
+import ResetPasswordFirstStepPage from "./resetPasswordFirstStepPage";
+import ResetPasswordSecondStepPage from "./resetPasswordSecondStepPage";
 
-export { LogingPage, ForgotPasswordPage, ResetPasswordPage };
+export { LogingPage, ResetPasswordFirstStepPage, ResetPasswordSecondStepPage };
