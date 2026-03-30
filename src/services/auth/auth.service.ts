@@ -2,19 +2,31 @@ import type {
   ResetPasswordFirstStepRequest,
   ResetPasswordSecondStepRequest,
 } from "../../schemas/auth";
-import type { AuthUser } from "../../types/user";
+import type { AuthSession, AuthSessionResponse } from "../../types/permissions";
 import { apiClient } from "../api.client";
 import type { LoginDTO } from "./";
 
 export const authService = {
-  async login(data: LoginDTO): Promise<AuthUser> {
-    const response = await apiClient.post("/auth/login", data);
-    return response.data.user as AuthUser;
+  async login(data: LoginDTO): Promise<AuthSession> {
+    const response = await apiClient.post<AuthSessionResponse>("/auth/login", data);
+    const session = response.data.session;
+
+    if (!session) {
+      throw new Error("Credenciais inválidas ou conta inativa.");
+    }
+
+    return session;
   },
 
-  async checkSession(): Promise<AuthUser> {
-    const response = await apiClient.get<AuthUser>("/auth/check-session");
-    return response.data;
+  async checkSession(): Promise<AuthSession> {
+    const response = await apiClient.get<AuthSessionResponse>("/auth/check-session");
+    const session = response.data.session;
+
+    if (!session) {
+      throw new Error("Sessão não encontrada.");
+    }
+
+    return session;
   },
 
   async refreshToken(): Promise<void> {

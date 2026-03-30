@@ -8,18 +8,19 @@ import type {
   ResetPasswordSecondStepRequest,
 } from "../../schemas/auth";
 import { authService } from "../../services/auth";
-import type { AuthState, AuthUser } from "./";
+import type { AuthSession } from "../../types/permissions";
+import type { AuthState } from "./";
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-      user: null,
+      currentSession: null,
       isLoading: false,
       hasCheckedAuth: false,
       errorMessage: null,
 
-      setUser: (user: AuthUser | null) => {
-        set({ user });
+      setCurrentSession: (session: AuthSession | null) => {
+        set({ currentSession: session });
       },
 
       login: async (data: LoginRequest) => {
@@ -28,9 +29,9 @@ export const useAuthStore = create<AuthState>()(
         const { credential, password, rememberMe } = data;
 
         try {
-          const user = await authService.login({ credential, password });
+          const session = await authService.login({ credential, password });
 
-          set({ user, hasCheckedAuth: true });
+          set({ currentSession: session, hasCheckedAuth: true });
 
           if (rememberMe) {
             const encryptedParams = CryptoJS.AES.encrypt(
@@ -64,8 +65,8 @@ export const useAuthStore = create<AuthState>()(
       checkAuth: async () => {
         if (get().hasCheckedAuth) return;
 
-        const persistedUser = get().user;
-        if (!persistedUser) {
+        const persistedSession = get().currentSession;
+        if (!persistedSession) {
           set({ hasCheckedAuth: true });
           return;
         }
@@ -73,26 +74,35 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
 
         try {
-          const userFromServer = await authService.checkSession();
+          const sessionFromServer = await authService.checkSession();
 
           set({
-            user: {
-              fullName: persistedUser.fullName,
-              email: persistedUser.email,
-              id: userFromServer.id,
-              role: userFromServer.role,
-              permissions: userFromServer.permissions,
+            currentSession: {
+              ...sessionFromServer,
+              user: {
+                ...sessionFromServer.user,
+                fullName: sessionFromServer.user.fullName || persistedSession.user.fullName,
+              },
             },
           });
-        } catch {
-          set({ user: null, errorMessage: null });
-          notifications.show({
-            title: "Sessão expirada",
-            message: "A sessão expirou. Por favor, faça login novamente.",
-            color: "var(--status-warning)",
-            position: "bottom-center",
-            autoClose: 10000,
-          });
+        } catch (error) {
+          const status =
+            (error as { response?: { status?: number } })?.response?.status ??
+            (error as { status?: number })?.status ??
+            null;
+
+          const isAuthError = status === 401 || status === 403;
+
+          if (isAuthError) {
+            set({ currentSession: null, errorMessage: null });
+            notifications.show({
+              title: "Sessão expirada",
+              message: "A sessão expirou. Por favor, faça login novamente.",
+              color: "var(--status-warning)",
+              position: "bottom-center",
+              autoClose: 10000,
+            });
+          }
         } finally {
           set({ hasCheckedAuth: true, isLoading: false });
         }
@@ -111,7 +121,7 @@ export const useAuthStore = create<AuthState>()(
             autoClose: 8000,
           });
         } finally {
-          set({ user: null, hasCheckedAuth: true, errorMessage: null });
+          set({ currentSession: null, hasCheckedAuth: true, errorMessage: null });
         }
       },
 
@@ -169,7 +179,7 @@ export const useAuthStore = create<AuthState>()(
     {
       name: "auth-storage",
       partialize: (state) => ({
-        user: state.user,
+        currentSession: state.currentSession,
       }),
     },
   ),
