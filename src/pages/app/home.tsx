@@ -8,8 +8,9 @@ import { useAuthStore } from "../../stores/auth";
 import { useTimingStore } from "../../stores/utils";
 
 const HomePage = () => {
-  const { user } = useAuthStore();
+  const { currentSession } = useAuthStore();
   const { greeting, formattedDate } = useTimingStore();
+  const user = currentSession?.user;
 
   return (
     <Box className="max-w-7xl mx-auto space-y-6">

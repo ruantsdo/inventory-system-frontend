@@ -52,7 +52,8 @@ interface SidebarProps {
 
 export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: SidebarProps) {
   const [activeItem, setActiveItem] = useState("/dashboard");
-  const { logout, user } = useAuthStore();
+  const { logout, currentSession } = useAuthStore();
+  const user = currentSession?.user ?? null;
 
   const isCollapsed = collapsed && !mobileOpen;
 
@@ -259,7 +260,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
                     {user?.fullName}
                   </Text>
                   <Text size="xs" className="text-text-secondary truncate">
-                    {user?.role}
+                  {currentSession?.roles?.[0]?.displayName}
                   </Text>
                 </Box>
                 <Tooltip label="Sair" position="top" withArrow>
