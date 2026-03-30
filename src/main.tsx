@@ -23,7 +23,13 @@ const App = () => {
   return <RouterProvider router={router} />;
 };
 
-useAuthStore.getState().checkAuth();
+const unsubscribe = useAuthStore.persist.onFinishHydration(() => {
+  useAuthStore.getState().checkAuth();
+  unsubscribe();
+});
+if (useAuthStore.persist.hasHydrated()) {
+  useAuthStore.getState().checkAuth();
+}
 
 const rootElement = document.getElementById("root");
 if (!rootElement) throw new Error("Elemento root não encontrado. Verifique o index.html.");

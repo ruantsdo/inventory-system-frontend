@@ -26,7 +26,12 @@ function flushQueue(error: unknown = null) {
   pendingQueue = [];
 }
 
-const SKIP_REFRESH_URLS = ["/auth/login", "/auth/refresh-token", "/auth/reset-password"];
+const SKIP_REFRESH_URLS = [
+  "/auth/login",
+  "/auth/refresh-token",
+  "/auth/reset-password",
+  "/auth/check-session",
+];
 
 const shouldSkipRefresh = (url?: string): boolean => {
   if (!url) return false;
@@ -60,7 +65,7 @@ async function handleRefreshFlow(originalRequest: InternalAxiosRequestConfig) {
     flushQueue(refreshError);
 
     const { useAuthStore } = await import("../stores/auth");
-    useAuthStore.getState().setUser(null);
+    useAuthStore.getState().setCurrentSession(null);
 
     if (window.location.pathname !== "/login") {
       window.location.href = "/login";
@@ -117,10 +122,15 @@ apiClient.interceptors.response.use(
       return Promise.reject(new Error("Link de redefinição de senha inválido ou expirado."));
     }
 
-    if (!isSilentError(requestUrl)) {
-      showErrorNotification(errorData);
+    if (isSilentError(requestUrl)) {
+      const silentError = new Error(errorData?.message ?? "Erro inesperado") as Error & {
+        status?: number;
+      };
+      silentError.status = status;
+      return Promise.reject(silentError);
     }
 
+    showErrorNotification(errorData);
     const message = errorData?.message ?? "Erro inesperado";
     return Promise.reject(new Error(message));
   },
