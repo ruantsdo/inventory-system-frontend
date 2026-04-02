@@ -2,10 +2,12 @@ import { Box, UnstyledButton } from "@mantine/core";
 import { FaBars } from "react-icons/fa";
 import { Outlet } from "react-router";
 import { Sidebar } from "../components/Sidebar";
+import { useSessionRevalidation } from "../hooks/useSessionRevalidation";
 import { useUIStore } from "../stores/context";
 
 export function AppLayout() {
   const { isSidebarOpen, toggleSidebar, isMobileSidebarOpen, toggleMobileSidebar } = useUIStore();
+  useSessionRevalidation();
 
   return (
     <Box className="flex h-screen bg-background overflow-hidden">

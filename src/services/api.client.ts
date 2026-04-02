@@ -124,9 +124,9 @@ apiClient.interceptors.response.use(
 
     if (isSilentError(requestUrl)) {
       const silentError = new Error(errorData?.message ?? "Erro inesperado") as Error & {
-        status?: number;
+        status?: number | null;
       };
-      silentError.status = status;
+      silentError.status = status ?? null;
       return Promise.reject(silentError);
     }
 

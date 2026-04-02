@@ -17,6 +17,7 @@ export const useAuthStore = create<AuthState>()(
       currentSession: null,
       isLoading: false,
       hasCheckedAuth: false,
+      isRevalidating: false,
       errorMessage: null,
 
       setCurrentSession: (session: AuthSession | null) => {
@@ -91,20 +92,67 @@ export const useAuthStore = create<AuthState>()(
             (error as { status?: number })?.status ??
             null;
 
-          const isAuthError = status === 401 || status === 403;
+          const isNetworkError = status === null;
+          const title = isNetworkError ? "Servidor indisponível" : "Sessão expirada";
+          const message = isNetworkError
+            ? "Não foi possível conectar ao servidor. Por favor, aguarde alguns instantes e tente novamente."
+            : "A sessão expirou. Por favor, faça login novamente.";
 
-          if (isAuthError) {
-            set({ currentSession: null, errorMessage: null });
-            notifications.show({
-              title: "Sessão expirada",
-              message: "A sessão expirou. Por favor, faça login novamente.",
-              color: "var(--status-warning)",
-              position: "bottom-center",
-              autoClose: 10000,
-            });
-          }
+          set({ currentSession: null, errorMessage: null });
+          notifications.show({
+            title,
+            message,
+            color: "var(--status-warning)",
+            position: "bottom-center",
+            autoClose: 10000,
+          });
         } finally {
           set({ hasCheckedAuth: true, isLoading: false });
+        }
+      },
+
+      revalidateSession: async () => {
+        if (get().isRevalidating) return;
+
+        const persistedSession = get().currentSession;
+        if (!persistedSession) return;
+
+        set({ isRevalidating: true });
+
+        try {
+          const sessionFromServer = await authService.checkSession();
+
+          set({
+            currentSession: {
+              ...sessionFromServer,
+              user: {
+                ...sessionFromServer.user,
+                fullName: sessionFromServer.user.fullName || persistedSession.user.fullName,
+              },
+            },
+          });
+        } catch (error) {
+          const status =
+            (error as { response?: { status?: number } })?.response?.status ??
+            (error as { status?: number })?.status ??
+            null;
+
+          const isNetworkError = status === null;
+          const title = isNetworkError ? "Servidor indisponível" : "Sessão encerrada";
+          const message = isNetworkError
+            ? "Não foi possível conectar ao servidor. Por favor, aguarde alguns instantes e tente novamente."
+            : "Sua sessão não é mais válida. Por favor, faça login novamente.";
+
+          set({ currentSession: null, hasCheckedAuth: true, errorMessage: null });
+          notifications.show({
+            title,
+            message,
+            color: "var(--status-warning)",
+            position: "bottom-center",
+            autoClose: 10000,
+          });
+        } finally {
+          set({ isRevalidating: false });
         }
       },
 
