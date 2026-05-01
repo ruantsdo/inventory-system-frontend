@@ -12,6 +12,7 @@ import {
   FaLayerGroup,
   FaSignOutAlt,
   FaTachometerAlt,
+  FaUsers,
 } from "react-icons/fa";
 import { useNavigate } from "react-router";
 import { useAuthStore } from "../stores/auth";
@@ -40,6 +41,11 @@ const navItems: NavItem[] = [
     label: "Movimentações",
     icon: <FaExchangeAlt size={16} />,
     path: "/movimentacoes",
+  },
+  {
+    label: "Usuários",
+    icon: <FaUsers size={16} />,
+    path: "/users/create",
   },
 ];
 
