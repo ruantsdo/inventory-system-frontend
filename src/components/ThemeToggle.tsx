@@ -2,9 +2,7 @@ import { ActionIcon, Button, useComputedColorScheme, useMantineColorScheme } fro
 import { useEffect, useState } from "react";
 import { FaMoon, FaSun } from "react-icons/fa";
 
-interface ThemeToggleProps {
-  iconOnly?: boolean;
-}
+import type { ThemeToggleProps } from "../types/components";
 
 export function ThemeToggle({ iconOnly = false }: ThemeToggleProps) {
   const { toggleColorScheme } = useMantineColorScheme();

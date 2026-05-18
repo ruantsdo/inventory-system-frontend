@@ -3,14 +3,7 @@ import { FaCapsules, FaSyringe } from "react-icons/fa";
 import { GiEyedropper } from "react-icons/gi";
 import { useNavigate } from "react-router";
 
-interface AlertItem {
-  id: number;
-  title: string;
-  description: string;
-  urgency: "alto" | "médio" | "baixo";
-  icon: React.ReactNode;
-  quantity: number;
-}
+import type { AlertItem } from "../types/dashboard";
 
 const alerts: AlertItem[] = [
   {

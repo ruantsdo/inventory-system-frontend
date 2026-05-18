@@ -1,5 +1,5 @@
 import { ActionIcon, Avatar, Box, Button, Indicator, Text, Tooltip } from "@mantine/core";
-import { useState } from "react";
+
 import {
   FaBars,
   FaBell,
@@ -14,15 +14,11 @@ import {
   FaTachometerAlt,
   FaUsers,
 } from "react-icons/fa";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "../stores/auth";
 import { ThemeToggle } from "./ThemeToggle";
 
-interface NavItem {
-  label: string;
-  icon: React.ReactNode;
-  path: string;
-}
+import type { NavItem, SidebarProps } from "../types/navigation";
 
 const navItems: NavItem[] = [
   {
@@ -49,25 +45,25 @@ const navItems: NavItem[] = [
   },
 ];
 
-interface SidebarProps {
-  collapsed: boolean;
-  onToggle: () => void;
-  mobileOpen: boolean;
-  onMobileClose: () => void;
-}
+
 
 export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: SidebarProps) {
-  const [activeItem, setActiveItem] = useState("/dashboard");
   const { logout, currentSession } = useAuthStore();
   const user = currentSession?.user ?? null;
 
   const isCollapsed = collapsed && !mobileOpen;
 
+  const location = useLocation();
   const navigate = useNavigate();
+
+  const activeItem =
+    navItems.find((item) => location.pathname.startsWith(item.path))?.path || "/dashboard";
 
   const handleNavigation = (path: string) => {
     navigate(path);
-    setActiveItem(path);
+    if (mobileOpen) {
+      onMobileClose();
+    }
   };
 
   return (
@@ -266,7 +262,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
                     {user?.fullName}
                   </Text>
                   <Text size="xs" className="text-text-secondary truncate">
-                  {currentSession?.roles?.[0]?.displayName}
+                    {currentSession?.roles?.[0]?.displayName}
                   </Text>
                 </Box>
                 <Tooltip label="Sair" position="top" withArrow>
