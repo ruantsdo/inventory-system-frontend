@@ -1,4 +1,4 @@
-import type { ProfessionalDocumentType } from "./api.contracts";
+import type { CreateUserPayload, ProfessionalDocumentType, RoleWithPermissionsOutput } from "./api.contracts";
 
 export interface AllocationEntry {
   id: string;
@@ -36,6 +36,8 @@ export interface CreateUserFormState {
   allocations: AllocationEntry[];
 }
 
+export type FieldErrors = Partial<Record<keyof CreateUserFormState, string>>;
+
 export const EMPTY_FORM_STATE: CreateUserFormState = {
   fullName: "",
   birthDate: "",
@@ -55,3 +57,8 @@ export const EMPTY_FORM_STATE: CreateUserFormState = {
   documentNumber: "",
   allocations: [],
 };
+
+export interface CreateUserFinalStepProps {
+  payload: CreateUserPayload;
+  allRoles: RoleWithPermissionsOutput[];
+}

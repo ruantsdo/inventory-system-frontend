@@ -1,4 +1,4 @@
-export type ID = string;
+import type { ID } from "./permissions";
 
 export interface CityOutput {
   id: ID;
