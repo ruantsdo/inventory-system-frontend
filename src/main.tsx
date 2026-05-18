@@ -9,11 +9,12 @@ import { MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 
 import { RouterProvider } from "react-router";
+import { ErrorBoundary } from "./components";
 import { LoaderPage } from "./pages/public";
 import { router } from "./routes/";
 import { useAuthStore } from "./stores/auth";
 
-const App = () => {
+function App() {
   const hasCheckedAuth = useAuthStore((state) => state.hasCheckedAuth);
 
   if (!hasCheckedAuth) {
@@ -21,7 +22,7 @@ const App = () => {
   }
 
   return <RouterProvider router={router} />;
-};
+}
 
 const unsubscribe = useAuthStore.persist.onFinishHydration(() => {
   useAuthStore.getState().checkAuth();
@@ -37,8 +38,10 @@ if (!rootElement) throw new Error("Elemento root não encontrado. Verifique o in
 createRoot(rootElement).render(
   <StrictMode>
     <MantineProvider>
-      <Notifications />
-      <App />
+      <ErrorBoundary>
+        <Notifications />
+        <App />
+      </ErrorBoundary>
     </MantineProvider>
   </StrictMode>,
 );
