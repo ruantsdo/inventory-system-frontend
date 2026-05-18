@@ -23,7 +23,7 @@ import {
 } from "../../schemas/auth";
 import { useAuthStore } from "../../stores/auth";
 
-const ResetPasswordFirstStepPage = () => {
+export function ResetPasswordFirstStepPage() {
   const { resetPasswordFirstStep, isLoading } = useAuthStore();
   const [lockSubmit, setLockSubmit] = useState<boolean>(false);
 
@@ -171,6 +171,4 @@ const ResetPasswordFirstStepPage = () => {
       </Container>
     </Box>
   );
-};
-
-export default ResetPasswordFirstStepPage;
+}

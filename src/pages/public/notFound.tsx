@@ -3,7 +3,7 @@ import { Box, Button, Stack, Text, Title } from "@mantine/core";
 import { useNavigate } from "react-router";
 import { ThemeToggle } from "../../components";
 
-const PageNotFound = () => {
+export function NotFoundPage() {
   const navigate = useNavigate();
 
   const handleGoBack = () => {
@@ -40,6 +40,4 @@ const PageNotFound = () => {
       </Button>
     </Box>
   );
-};
-
-export default PageNotFound;
+}

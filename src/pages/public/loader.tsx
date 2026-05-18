@@ -2,7 +2,7 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { Box, Stack, Text, Title } from "@mantine/core";
 import { ThemeToggle } from "../../components";
 
-const LoaderPage = () => {
+export function LoaderPage() {
   return (
     <Box className="bg-background h-screen w-screen relative flex flex-col items-center justify-center">
       <Box pos="absolute" top={20} right={20}>
@@ -25,6 +25,4 @@ const LoaderPage = () => {
       </Box>
     </Box>
   );
-};
-
-export default LoaderPage;
+}

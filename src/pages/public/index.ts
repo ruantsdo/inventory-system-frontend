@@ -1,4 +1,2 @@
-import LoaderPage from "./loader";
-import NotFoundPage from "./notFound";
-
-export { NotFoundPage, LoaderPage };
+export { LoaderPage } from "./loader";
+export { NotFoundPage } from "./notFound";

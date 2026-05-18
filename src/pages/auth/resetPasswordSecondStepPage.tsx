@@ -12,7 +12,7 @@ import {
 } from "../../schemas/auth";
 import { useAuthStore } from "../../stores/auth";
 
-const ResetPasswordSecondStepPage = () => {
+export function ResetPasswordSecondStepPage() {
   const navigate = useNavigate();
   const { resetPasswordSecondStep, isLoading } = useAuthStore();
   const { token } = useParams();
@@ -150,6 +150,4 @@ const ResetPasswordSecondStepPage = () => {
       </Container>
     </Box>
   );
-};
-
-export default ResetPasswordSecondStepPage;
+}
