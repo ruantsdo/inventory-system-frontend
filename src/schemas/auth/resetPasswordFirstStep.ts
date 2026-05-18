@@ -1,4 +1,8 @@
+import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import { z } from "zod";
+
+dayjs.extend(customParseFormat);
 
 export const resetPasswordFirstStepSchema = z.object({
   cpf: z
@@ -12,10 +16,8 @@ export const resetPasswordFirstStepSchema = z.object({
   birthDate: z
     .string()
     .min(1, "Data de nascimento é obrigatória")
-    .refine((val) => {
-      const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
-      return dateRegex.test(val);
-    }, "Formato inválido (DD/MM/AAAA)"),
+    .refine((val) => dayjs(val, "DD/MM/YYYY", true).isValid(), "Data inválida (DD/MM/AAAA)"),
 });
 
 export type ResetPasswordFirstStepRequest = z.infer<typeof resetPasswordFirstStepSchema>;
+
