@@ -8,7 +8,10 @@ import type { LoginDTO } from "./";
 
 export const authService = {
   async login(data: LoginDTO): Promise<AuthSession> {
-    const response = await apiClient.post<AuthSessionResponse>("/auth/login", data);
+    const response = await apiClient.post<{ status: string; session: AuthSession }>(
+      "/auth/login",
+      data,
+    );
     const session = response.data.session;
 
     if (!session) {
@@ -46,5 +49,12 @@ export const authService = {
     token: string,
   ): Promise<void> {
     await apiClient.post("/auth/reset-password/second-step", { ...data, token });
+  },
+
+  async confirmActivation(
+    data: ResetPasswordSecondStepRequest,
+    token: string,
+  ): Promise<void> {
+    await apiClient.post("/api/users/activation/confirm", { ...data, token });
   },
 };

@@ -31,6 +31,7 @@ const SKIP_REFRESH_URLS = [
   "/auth/refresh-token",
   "/auth/reset-password",
   "/auth/check-session",
+  "/users/activation",
 ];
 
 const shouldSkipRefresh = (url?: string): boolean => {

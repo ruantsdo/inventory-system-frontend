@@ -32,7 +32,15 @@ export const useAuthStore = create<AuthState>()(
         try {
           const session = await authService.login({ credential, password });
 
+          session.activeContext = {
+            facilityId: session.facilities[0]?.id || null,
+            facilityName: session.facilities[0]?.name || null,
+            isGlobal: session.activeContext?.isGlobal || false,
+          };
+
           set({ currentSession: session, hasCheckedAuth: true });
+
+          console.log("session", session);
 
           if (rememberMe) {
             const encryptedParams = CryptoJS.AES.encrypt(
@@ -217,6 +225,22 @@ export const useAuthStore = create<AuthState>()(
         } catch (error) {
           const message =
             error instanceof Error ? error.message : "Erro inesperado ao redefinir senha.";
+          set({ errorMessage: message });
+          return false;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      confirmActivation: async (data: ResetPasswordSecondStepRequest, token: string) => {
+        set({ isLoading: true, errorMessage: null });
+
+        try {
+          await authService.confirmActivation(data, token);
+          return true;
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "Erro inesperado ao ativar conta.";
           set({ errorMessage: message });
           return false;
         } finally {
