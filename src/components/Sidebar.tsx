@@ -16,36 +16,37 @@ import {
 } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "../stores/auth";
-import { ThemeToggle } from "./ThemeToggle";
-
 import type { NavItem, SidebarProps } from "../types/navigation";
+import { ThemeToggle } from "./ThemeToggle";
 
 const navItems: NavItem[] = [
   {
     label: "Dashboard",
     icon: <FaTachometerAlt size={16} />,
     path: "/dashboard",
+    permission: "dashboard.view",
   },
-  { label: "Estoque", icon: <FaBoxes size={16} />, path: "/estoque" },
+  { label: "Estoque", icon: <FaBoxes size={16} />, path: "/estoque", permission: "stock.view" },
   {
     label: "Requisições",
     icon: <FaFileAlt size={16} />,
     path: "/requisicoes",
+    permission: "requests.view",
   },
-  { label: "Lotes", icon: <FaLayerGroup size={16} />, path: "/lotes" },
+  { label: "Lotes", icon: <FaLayerGroup size={16} />, path: "/lotes", permission: "lots.view" },
   {
     label: "Movimentações",
     icon: <FaExchangeAlt size={16} />,
     path: "/movimentacoes",
+    permission: "movements.view",
   },
   {
     label: "Usuários",
     icon: <FaUsers size={16} />,
     path: "/users/create",
+    permission: "users.view",
   },
 ];
-
-
 
 export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: SidebarProps) {
   const { logout, currentSession } = useAuthStore();
