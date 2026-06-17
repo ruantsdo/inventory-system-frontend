@@ -11,4 +11,5 @@ export interface UtilsState {
   cepError: string | null;
 
   fetchCep: (cep: string) => Promise<ViaCepResponse>;
+  checkPermission: (permissionName: string) => boolean;
 }

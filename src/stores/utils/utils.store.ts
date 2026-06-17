@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { useAuthStore } from "../auth";
 import type { UtilsState } from "./utils.types";
 
 export const useUtilsStore = create<UtilsState>((set) => ({
@@ -22,5 +23,13 @@ export const useUtilsStore = create<UtilsState>((set) => ({
     } finally {
       set({ cepIsLoading: false });
     }
+  },
+
+  checkPermission: (permissionName: string) => {
+    const { currentSession } = useAuthStore.getState();
+    if (!currentSession) return false;
+    const effectivePermissions = currentSession.effectivePermissions;
+    const autorized = effectivePermissions.some((ep) => ep.name === permissionName);
+    return autorized;
   },
 }));
