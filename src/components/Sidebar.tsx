@@ -1,5 +1,5 @@
 import { ActionIcon, Avatar, Box, Button, Indicator, Text, Tooltip } from "@mantine/core";
-
+import { useEffect, useState } from "react";
 import {
   FaBars,
   FaBell,
@@ -16,6 +16,7 @@ import {
 } from "react-icons/fa";
 import { useLocation, useNavigate } from "react-router";
 import { useAuthStore } from "../stores/auth";
+import { useUtilsStore } from "../stores/utils";
 import type { NavItem, SidebarProps } from "../types/navigation";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -24,21 +25,20 @@ const navItems: NavItem[] = [
     label: "Dashboard",
     icon: <FaTachometerAlt size={16} />,
     path: "/dashboard",
-    permission: "dashboard.view",
   },
-  { label: "Estoque", icon: <FaBoxes size={16} />, path: "/estoque", permission: "stock.view" },
+  { label: "Estoque", icon: <FaBoxes size={16} />, path: "/estoque", permission: "inventory.view" },
   {
     label: "Requisições",
     icon: <FaFileAlt size={16} />,
     path: "/requisicoes",
     permission: "requests.view",
   },
-  { label: "Lotes", icon: <FaLayerGroup size={16} />, path: "/lotes", permission: "lots.view" },
+  { label: "Lotes", icon: <FaLayerGroup size={16} />, path: "/lotes", permission: "batches.view" },
   {
     label: "Movimentações",
     icon: <FaExchangeAlt size={16} />,
     path: "/movimentacoes",
-    permission: "movements.view",
+    permission: "requests.view",
   },
   {
     label: "Usuários",
@@ -51,14 +51,16 @@ const navItems: NavItem[] = [
 export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: SidebarProps) {
   const { logout, currentSession } = useAuthStore();
   const user = currentSession?.user ?? null;
+  const [filteredNavItems, setFilteredNavItems] = useState<NavItem[]>([]);
 
   const isCollapsed = collapsed && !mobileOpen;
 
   const location = useLocation();
   const navigate = useNavigate();
+  const { checkPermission } = useUtilsStore();
 
   const activeItem =
-    navItems.find((item) => location.pathname.startsWith(item.path))?.path || "/dashboard";
+    filteredNavItems.find((item) => location.pathname.startsWith(item.path))?.path || "/dashboard";
 
   const handleNavigation = (path: string) => {
     navigate(path);
@@ -66,6 +68,13 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
       onMobileClose();
     }
   };
+
+  useEffect(() => {
+    const filteredNavItems = navItems.filter((item) =>
+      item.permission ? checkPermission(item.permission) : true,
+    );
+    setFilteredNavItems(filteredNavItems);
+  }, [currentSession?.activeContext]);
 
   return (
     <>
@@ -102,7 +111,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
                   Gestão de Estoque
                 </Text>
                 <Text size="xs" className="text-text-secondary truncate">
-                  {navItems.find((item) => item.path === activeItem)?.label || "Dashboard"}
+                  {filteredNavItems.find((item) => item.path === activeItem)?.label || "Dashboard"}
                 </Text>
               </Box>
             </Box>
@@ -126,7 +135,7 @@ export function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: Side
         </Box>
 
         <nav className="flex flex-col py-4 px-3 gap-1 overflow-y-auto">
-          {navItems.map((item) => {
+          {filteredNavItems.map((item) => {
             const isActive = item.path === activeItem;
 
             const navButton = isCollapsed ? (
