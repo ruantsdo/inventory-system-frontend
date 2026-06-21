@@ -8,6 +8,7 @@ import type {
   ResetPasswordSecondStepRequest,
 } from "../../schemas/auth";
 import { authService } from "../../services/auth";
+import { getAllFacilitiesForSession } from "../../services/facilities";
 import type { AuthSession } from "../../types/permissions";
 import type { AuthState } from "./";
 
@@ -32,6 +33,9 @@ export const useAuthStore = create<AuthState>()(
         try {
           const session = await authService.login({ credential, password });
 
+          const facilities = await getAllFacilitiesForSession();
+          session.facilities = facilities ? facilities : [];
+
           session.activeContext = {
             facilityId: session.facilities[0]?.id || null,
             facilityName: session.facilities[0]?.name || null,
@@ -39,8 +43,6 @@ export const useAuthStore = create<AuthState>()(
           };
 
           set({ currentSession: session, hasCheckedAuth: true });
-
-          console.log("session", session);
 
           if (rememberMe) {
             const encryptedParams = CryptoJS.AES.encrypt(
@@ -92,6 +94,11 @@ export const useAuthStore = create<AuthState>()(
                 ...sessionFromServer.user,
                 fullName: sessionFromServer.user.fullName || persistedSession.user.fullName,
               },
+              facilities: persistedSession.facilities ?? [],
+              activeContext: {
+                ...sessionFromServer.activeContext,
+                ...persistedSession.activeContext,
+              },
             },
           });
         } catch (error) {
@@ -136,6 +143,11 @@ export const useAuthStore = create<AuthState>()(
               user: {
                 ...sessionFromServer.user,
                 fullName: sessionFromServer.user.fullName || persistedSession.user.fullName,
+              },
+              facilities: persistedSession.facilities ?? [],
+              activeContext: {
+                ...sessionFromServer.activeContext,
+                ...persistedSession.activeContext,
               },
             },
           });

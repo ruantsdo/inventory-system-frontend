@@ -16,6 +16,12 @@ export interface FacilityOutput {
   isActive: boolean;
 }
 
+export interface FacilityForSession {
+  id: ID;
+  name: string;
+  isDefault?: boolean;
+}
+
 export interface PermissionOutput {
   id: ID;
   name: string;

@@ -12,4 +12,5 @@ export interface UtilsState {
 
   fetchCep: (cep: string) => Promise<ViaCepResponse>;
   checkPermission: (permissionName: string) => boolean;
+  handleNavigation: (path: string, permission: string) => void;
 }

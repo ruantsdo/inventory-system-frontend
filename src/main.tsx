@@ -1,11 +1,11 @@
-import { StrictMode } from "react";
+import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 
-import { MantineProvider } from "@mantine/core";
+import { MantineProvider, useComputedColorScheme } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 
 import { RouterProvider } from "react-router";
@@ -16,6 +16,17 @@ import { useAuthStore } from "./stores/auth";
 
 function App() {
   const hasCheckedAuth = useAuthStore((state) => state.hasCheckedAuth);
+  const computedColorScheme = useComputedColorScheme("light", {
+    getInitialValueInEffect: true,
+  });
+
+  useEffect(() => {
+    if (computedColorScheme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [computedColorScheme]);
 
   if (!hasCheckedAuth) {
     return <LoaderPage />;

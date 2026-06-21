@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { router } from "../../routes";
 import { useAuthStore } from "../auth";
 import type { UtilsState } from "./utils.types";
 
@@ -31,5 +32,12 @@ export const useUtilsStore = create<UtilsState>((set) => ({
     const effectivePermissions = currentSession.effectivePermissions;
     const autorized = effectivePermissions.some((ep) => ep.name === permissionName);
     return autorized;
+  },
+
+  handleNavigation: (path: string, permission: string) => {
+    if (useUtilsStore.getState().checkPermission(permission)) {
+      const absolutePath = path.startsWith("/") ? path : `/${path}`;
+      router.navigate(absolutePath);
+    }
   },
 }));

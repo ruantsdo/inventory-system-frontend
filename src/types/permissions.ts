@@ -1,4 +1,5 @@
 import type { AppPermissionKey, PermissionScopeMode } from "../enums/permissions";
+import type { FacilityForSession } from "./api.contracts";
 import type { AuthUser } from "./user";
 
 export type ID = string;
@@ -52,11 +53,7 @@ export interface AuthSession {
 
   effectivePermissions: EffectivePermission[];
 
-  facilities: {
-    id: ID;
-    name: string;
-    isDefault?: boolean;
-  }[];
+  facilities: FacilityForSession[];
 
   activeContext: ActiveContext;
 
