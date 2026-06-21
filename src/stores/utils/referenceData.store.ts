@@ -1,10 +1,7 @@
 import { create } from "zustand";
-import {
-  getFacilitiesByCity as fetchFacilitiesByCity,
-  getCities,
-  getMyPermissions,
-  getRoles,
-} from "../../services/users";
+import { getFacilitiesByCity as fetchFacilitiesByCity } from "../../services/facilities";
+import { getCities } from "../../services/geo";
+import { getMyPermissions, getRoles } from "../../services/permissions";
 import type { ReferenceDataState } from "./referenceData.types";
 
 export const useReferenceDataStore = create<ReferenceDataState>((set, get) => ({
