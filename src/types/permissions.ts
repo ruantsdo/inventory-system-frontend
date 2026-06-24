@@ -25,6 +25,13 @@ export interface Facility {
   isActive: boolean;
 }
 
+export interface SessionRole {
+  roleId: ID;
+  displayName?: string;
+  facilities: ID[];
+  permissionIds: ID[];
+}
+
 export interface ActiveContext {
   facilityId: ID | null;
   facilityName?: string | null;
@@ -32,6 +39,8 @@ export interface ActiveContext {
   locationId?: ID | null;
 
   isGlobal: boolean;
+
+  activeRoleDisplayName?: string | null;
 }
 
 export interface EffectivePermission {
@@ -48,6 +57,8 @@ export interface AuthSession {
   user: AuthUser;
 
   roles: Role[];
+
+  sessionRoles?: SessionRole[];
 
   permissions: AppPermissionKey[];
 
