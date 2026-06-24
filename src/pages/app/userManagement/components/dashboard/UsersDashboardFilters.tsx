@@ -2,7 +2,7 @@ import { Box, SegmentedControl, TextInput } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
-import type { UserStatusFilter } from "../../../../types/usersDashboard";
+import type { UserStatusFilter } from "../../../../../types/usersDashboard";
 
 interface UsersDashboardFiltersProps {
   onSearchChange: (value: string) => void;

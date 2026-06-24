@@ -1,9 +1,9 @@
 import { Alert, Box, Group, Pagination, Text } from "@mantine/core";
 import { FaExclamationTriangle, FaUsers } from "react-icons/fa";
 import { StatCard } from "../../../components/StatCard";
-import { UsersDashboardFilters } from "./components/UsersDashboardFilters";
-import { UsersDashboardHeader } from "./components/UsersDashboardHeader";
-import { UsersTable } from "./components/UsersTable";
+import { UsersDashboardFilters } from "./components/dashboard/UsersDashboardFilters";
+import { UsersDashboardHeader } from "./components/dashboard/UsersDashboardHeader";
+import { UsersTable } from "./components/dashboard/UsersTable";
 import { useUsersDashboard } from "./hooks/useUsersDashboard";
 
 export const UsersDashboardPage = () => {

@@ -10,9 +10,12 @@ import {
   Text,
   Tooltip,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { useState } from "react";
 import { FaEdit, FaEye } from "react-icons/fa";
-import { useUtilsStore } from "../../../../stores/utils";
-import type { UserListItem } from "../../../../types/usersDashboard";
+import { useUtilsStore } from "../../../../../stores/utils";
+import type { UserListItem } from "../../../../../types/usersDashboard";
+import { ProfileModal } from "../ProfileModal";
 
 interface UsersTableProps {
   users: UserListItem[];
@@ -35,6 +38,18 @@ function UserRowSkeleton() {
 export function UsersTable({ users, loading }: UsersTableProps) {
   const { checkPermission } = useUtilsStore();
   const canUpdate = checkPermission("users.update");
+
+  const [opened, { open, close }] = useDisclosure(false);
+  const [userId, setUserId] = useState<string>("");
+
+  const handleProfileModal = (userId: string) => {
+    if (opened) {
+      close();
+    } else {
+      setUserId(userId);
+      open();
+    }
+  };
 
   const rows = loading
     ? Array.from({ length: 5 }).map((_, i) => (
@@ -78,6 +93,7 @@ export function UsersTable({ users, loading }: UsersTableProps) {
                   color="blue"
                   size="sm"
                   radius="md"
+                  onClick={() => handleProfileModal(user.id)}
                 >
                   <FaEye size={13} />
                 </ActionIcon>
@@ -91,6 +107,7 @@ export function UsersTable({ users, loading }: UsersTableProps) {
                     color="green"
                     size="sm"
                     radius="md"
+                    onClick={() => handleProfileModal(user.id)}
                   >
                     <FaEdit size={13} />
                   </ActionIcon>
@@ -140,6 +157,7 @@ export function UsersTable({ users, loading }: UsersTableProps) {
           )}
         </Table.Tbody>
       </Table>
+      {opened && <ProfileModal opened={opened} handleClose={close} targetId={userId} />}
     </Paper>
   );
 }
