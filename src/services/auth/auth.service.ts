@@ -51,10 +51,7 @@ export const authService = {
     await apiClient.post("/auth/reset-password/second-step", { ...data, token });
   },
 
-  async confirmActivation(
-    data: ResetPasswordSecondStepRequest,
-    token: string,
-  ): Promise<void> {
+  async confirmActivation(data: ResetPasswordSecondStepRequest, token: string): Promise<void> {
     await apiClient.post("/api/users/activation/confirm", { ...data, token });
   },
 };
