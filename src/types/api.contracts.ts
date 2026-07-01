@@ -22,14 +22,16 @@ export interface FacilityForSession {
   isDefault?: boolean;
 }
 
+export type PermissionScopeMode = "GLOBAL" | "FACILITY" | "OWN";
+
+export type UserRoleScopeMode = "GLOBAL" | "FACILITY_SET";
+
 export interface PermissionOutput {
   id: ID;
   name: string;
   displayName: string;
   description: string | null;
-  scopeMode: string;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
+  scopeMode: PermissionScopeMode;
 }
 
 export interface RoleWithPermissionsOutput {
@@ -37,10 +39,14 @@ export interface RoleWithPermissionsOutput {
   name: string;
   displayName: string;
   description: string | null;
-  createdAt?: string | Date;
-  updatedAt?: string | Date;
+  category: string;
+  governanceLevel: string;
   permissions: PermissionOutput[];
 }
+
+export type RoleCategory = "FUNCTIONAL" | "ADMINISTRATIVE";
+
+export type GovernanceLevel = "ROOT" | "SUPER_ADMIN" | "SYSTEM_ADMIN" | "MANAGER";
 
 export type ProfessionalDocumentType =
   | "CRM"
@@ -74,19 +80,19 @@ export interface CreateUserPayload {
   email: string;
   cpf: string;
   birthDate: string;
-  phone?: string;
+  phone?: string | undefined;
 
-  cityId?: string;
-  zipCode?: string;
-  streetAddress?: string;
-  number?: string;
-  additionalInfo?: string;
-  neighborhood?: string;
-  addressCity?: string;
-  state?: string;
+  cityId?: string | undefined;
+  zipCode?: string | undefined;
+  streetAddress?: string | undefined;
+  number?: string | undefined;
+  additionalInfo?: string | undefined;
+  neighborhood?: string | undefined;
+  addressCity?: string | undefined;
+  state?: string | undefined;
 
   roles: UserRolePayload[];
-  professionalDocuments?: UserProfessionalDocumentPayload[];
+  professionalDocuments?: UserProfessionalDocumentPayload[] | undefined;
 }
 
 export interface ResendActivationPayload {
@@ -108,4 +114,54 @@ export interface MessageResponse {
 export interface CreateUserResponse {
   id: ID;
   message: string;
+}
+
+export interface UpdateUserPayload {
+  fullName: string;
+  email: string;
+  cpf: string;
+  birthDate: string;
+  phone?: string | undefined;
+
+  cityId?: string | undefined;
+  zipCode?: string | undefined;
+  streetAddress?: string | undefined;
+  number?: string | undefined;
+  additionalInfo?: string | undefined;
+  neighborhood?: string | undefined;
+  addressCity?: string | undefined;
+  state?: string | undefined;
+
+  roles: UserRolePayload[];
+  professionalDocuments?: UserProfessionalDocumentPayload[] | undefined;
+}
+
+export interface UserRoleEditDetail {
+  roleId: string;
+  roleName: string;
+  facilities: string[];
+  permissionNames?: string[] | undefined;
+  facilityDetails?:
+    | { id: string; name: string; cityId?: string | undefined; cityName?: string | undefined }[]
+    | undefined;
+  permissionDetails?: { id: string; name: string; displayName: string }[] | undefined;
+}
+
+export interface UserEditData {
+  fullName: string;
+  email: string;
+  cpf: string;
+  birthDate: string;
+  phone?: string | undefined;
+
+  zipCode?: string | undefined;
+  streetAddress?: string | undefined;
+  number?: string | undefined;
+  additionalInfo?: string | undefined;
+  neighborhood?: string | undefined;
+  addressCity?: string | undefined;
+  state?: string | undefined;
+
+  roles: UserRoleEditDetail[];
+  professionalDocuments?: UserProfessionalDocumentPayload[] | undefined;
 }
