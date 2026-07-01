@@ -1,13 +1,21 @@
 import { Box, UnstyledButton } from "@mantine/core";
+import { useEffect } from "react";
 import { FaBars } from "react-icons/fa";
-import { Outlet } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 import { Sidebar } from "../components/Sidebar/index";
 import { useSessionRevalidation } from "../hooks/useSessionRevalidation";
 import { useUIStore } from "../stores/context";
+import { navigationHelper } from "../utils";
 
 export function AppLayout() {
   const { isSidebarOpen, toggleSidebar, isMobileSidebarOpen, toggleMobileSidebar } = useUIStore();
   useSessionRevalidation();
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    navigationHelper.navigate = navigate;
+  }, [navigate]);
+
 
   return (
     <Box className="flex h-screen bg-background overflow-hidden">
