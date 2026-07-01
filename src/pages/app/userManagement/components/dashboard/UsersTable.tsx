@@ -12,14 +12,17 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
-import { FaEdit, FaEye } from "react-icons/fa";
+import { FaEdit, FaEye, FaPause, FaPlay, FaTrash } from "react-icons/fa";
+import { useUserManagementStore } from "../../../../../stores/app/userManagement";
 import { useUtilsStore } from "../../../../../stores/utils";
 import type { UserListItem } from "../../../../../types/usersDashboard";
+import { DeleteUserConfirmModal } from "../DeleteConfirmationModal";
 import { ProfileModal } from "../ProfileModal";
 
 interface UsersTableProps {
   users: UserListItem[];
   loading: boolean;
+  refetch: () => Promise<void> | void;
 }
 
 function UserRowSkeleton() {
@@ -35,20 +38,46 @@ function UserRowSkeleton() {
   );
 }
 
-export function UsersTable({ users, loading }: UsersTableProps) {
-  const { checkPermission } = useUtilsStore();
+export function UsersTable({ users, loading, refetch }: UsersTableProps) {
+  const { checkPermission, handleNavigation } = useUtilsStore();
+  const { reactivateUser, deactivateUser } = useUserManagementStore();
+
   const canUpdate = checkPermission("users.update");
+  const canDelete = checkPermission("users.delete");
+  const canDeactivate = checkPermission("users.deactivate");
+  const canActivate = checkPermission("users.activate");
 
   const [opened, { open, close }] = useDisclosure(false);
-  const [userId, setUserId] = useState<string>("");
+  const [userId, setTargetId] = useState<string>("");
+
+  const [deleteOpened, setDeleteOpened] = useState(false);
+  const [targetToDelete, setTargetToDelete] = useState<UserListItem>();
 
   const handleProfileModal = (userId: string) => {
     if (opened) {
       close();
     } else {
-      setUserId(userId);
+      setTargetId(userId);
       open();
     }
+  };
+
+  const handleDeleteModal = (user: UserListItem) => {
+    if (deleteOpened) {
+      setDeleteOpened(false);
+    } else {
+      setTargetToDelete(user);
+      setDeleteOpened(true);
+    }
+  };
+
+  const handleChangeUserState = async (user: UserListItem) => {
+    if (user.isActive) {
+      await deactivateUser(user.id);
+    } else {
+      await reactivateUser(user.id);
+    }
+    await refetch();
   };
 
   const rows = loading
@@ -107,9 +136,44 @@ export function UsersTable({ users, loading }: UsersTableProps) {
                     color="green"
                     size="sm"
                     radius="md"
-                    onClick={() => handleProfileModal(user.id)}
+                    onClick={() => handleNavigation(`/users/edit/${user.id}`, "users.update")}
                   >
                     <FaEdit size={13} />
+                  </ActionIcon>
+                </Tooltip>
+              )}
+
+              {(canActivate || canDeactivate) && (
+                <Tooltip
+                  label={user.isActive ? "Desativar usuário" : "Ativar usuário"}
+                  withArrow
+                  position="top"
+                >
+                  <ActionIcon
+                    id={`user-delete-${user.id}`}
+                    variant="subtle"
+                    color="orange"
+                    size="sm"
+                    radius="md"
+                    disabled={user.isActive ? !canDeactivate : !canActivate}
+                    onClick={() => handleChangeUserState(user)}
+                  >
+                    {user.isActive ? <FaPause size={13} /> : <FaPlay size={13} />}
+                  </ActionIcon>
+                </Tooltip>
+              )}
+
+              {canDelete && (
+                <Tooltip label="Deletar usuário" withArrow position="top">
+                  <ActionIcon
+                    id={`user-delete-${user.id}`}
+                    variant="subtle"
+                    color="red"
+                    size="sm"
+                    radius="md"
+                    onClick={() => handleDeleteModal(user)}
+                  >
+                    <FaTrash size={13} />
                   </ActionIcon>
                 </Tooltip>
               )}
@@ -158,6 +222,14 @@ export function UsersTable({ users, loading }: UsersTableProps) {
         </Table.Tbody>
       </Table>
       {opened && <ProfileModal opened={opened} handleClose={close} targetId={userId} />}
+      {deleteOpened && targetToDelete && (
+        <DeleteUserConfirmModal
+          deleteOpened={deleteOpened}
+          setDeleteOpened={setDeleteOpened}
+          user={targetToDelete}
+          onSuccess={refetch}
+        />
+      )}
     </Paper>
   );
 }

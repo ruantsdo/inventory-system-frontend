@@ -5,7 +5,7 @@ import { useUtilsStore } from "../../../../../stores/utils";
 
 export function UsersDashboardHeader() {
   const { currentSession } = useAuthStore();
-  const { handleNavigation } = useUtilsStore();
+  const { handleNavigation, checkPermission } = useUtilsStore();
 
   return (
     <Box className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -31,9 +31,7 @@ export function UsersDashboardHeader() {
           <Text size="sm" c="var(--text-secondary)" mt={2}>
             Visualizando usuários em{" "}
             <span style={{ fontWeight: 600, color: "var(--text-main)" }}>
-              {currentSession?.activeContext.isGlobal
-                ? "Todas as unidades"
-                : currentSession?.activeContext.facilityName}
+              {currentSession?.activeContext.facilityName}
             </span>
           </Text>
         </Box>
@@ -43,6 +41,7 @@ export function UsersDashboardHeader() {
         id="users-dashboard-create-btn"
         leftSection={<FaPlus size={13} />}
         radius="md"
+        disabled={!checkPermission("users.create")}
         onClick={() => handleNavigation("users/create", "users.create")}
         style={{ background: "var(--primary)" }}
       >

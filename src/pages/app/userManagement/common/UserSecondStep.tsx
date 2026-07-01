@@ -4,15 +4,20 @@ import { useEffect, useId, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { FaPlus, FaShieldAlt, FaTimesCircle } from "react-icons/fa";
 import { useReferenceDataStore } from "../../../../stores/utils";
-import type { FacilityOutput } from "../../../../types/api.contracts";
+import type { FacilityOutput, RoleCategory } from "../../../../types/api.contracts";
 import type { AllocationEntry, CreateUserFormState } from "../../../../types/createUser";
 import { AllocationBuilder } from "./AllocationBuilder";
 import { AllocationList } from "./AllocationList";
 import { EmptyAllocationsPlaceholder } from "./EmptyAllocationsPlaceholder";
 
-export function CreateUserSecondStep() {
+interface UserSecondStepProps {
+  mode?: "create" | "edit";
+}
+
+export function UserSecondStep({ mode }: UserSecondStepProps) {
   const { watch, setValue } = useFormContext<CreateUserFormState>();
   const allocations = watch("allocations");
+  const fullName = watch("fullName");
   const uniqueId = useId();
 
   const {
@@ -22,8 +27,10 @@ export function CreateUserSecondStep() {
     referenceDataLoading,
     referenceDataError,
     loadReferenceData,
-    getFacilitiesByCity,
+    getActiveFacilitiesByCity,
   } = useReferenceDataStore();
+
+  const [roleCategory, setRoleCategory] = useState<RoleCategory>("FUNCTIONAL");
 
   const [builderCityId, setBuilderCityId] = useState<string | null>(null);
   const [builderFacilities, setBuilderFacilities] = useState<FacilityOutput[]>([]);
@@ -54,10 +61,10 @@ export function CreateUserSecondStep() {
       return;
     }
     setBuilderFacilitiesLoading(true);
-    getFacilitiesByCity(builderCityId)
+    getActiveFacilitiesByCity(builderCityId)
       .then(setBuilderFacilities)
       .finally(() => setBuilderFacilitiesLoading(false));
-  }, [builderCityId, getFacilitiesByCity]);
+  }, [builderCityId, getActiveFacilitiesByCity]);
 
   useEffect(() => {
     if (!builderRoleId) {
@@ -106,6 +113,7 @@ export function CreateUserSecondStep() {
     setBuilderSelectedFacilityIds([]);
     setBuilderRoleId(null);
     setBuilderSelectedPermissions([]);
+    setRoleCategory("FUNCTIONAL");
   }
 
   function handleRemoveAllocation(id: string) {
@@ -152,6 +160,22 @@ export function CreateUserSecondStep() {
 
   return (
     <Stack gap="lg">
+      {mode === "edit" && fullName && (
+        <Card
+          withBorder
+          padding="sm"
+          radius="md"
+          style={{
+            borderColor: "var(--primary)",
+            background: "color-mix(in srgb, var(--primary) 8%, transparent)",
+          }}
+        >
+          <Text size="sm" fw={600} c="var(--primary)">
+            Editando o usuário {fullName}
+          </Text>
+        </Card>
+      )}
+
       <Card
         withBorder
         padding="sm"
@@ -205,6 +229,8 @@ export function CreateUserSecondStep() {
             onRoleChange={setBuilderRoleId}
             builderSelectedPermissions={builderSelectedPermissions}
             onPermissionToggle={handlePermissionToggle}
+            roleCategory={roleCategory}
+            onRoleCategoryChange={setRoleCategory}
           />
 
           <Button

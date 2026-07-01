@@ -3,10 +3,8 @@ import {
   Badge,
   Box,
   Card,
-  Code,
   Divider,
   Group,
-  ScrollArea,
   Stack,
   Text,
   ThemeIcon,
@@ -19,12 +17,22 @@ import {
   FaClipboardList,
   FaEnvelope,
   FaFileAlt,
-  FaIdCard,
   FaShieldAlt,
   FaUser,
 } from "react-icons/fa";
 import { FaLocationCrosshairs } from "react-icons/fa6";
-import type { CreateUserFinalStepProps, CreateUserFormState } from "../../../../types/createUser";
+import type {
+  CreateUserPayload,
+  RoleWithPermissionsOutput,
+  UpdateUserPayload,
+} from "../../../../types/api.contracts";
+import type { CreateUserFormState } from "../../../../types/createUser";
+
+interface UserThirdStepProps {
+  payload: CreateUserPayload | UpdateUserPayload;
+  allRoles: RoleWithPermissionsOutput[];
+  mode?: "create" | "edit";
+}
 
 function SectionHeader({
   icon,
@@ -65,23 +73,43 @@ function InfoRow({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
-export function CreateUserFinalStep({ payload, allRoles }: CreateUserFinalStepProps) {
+export function UserThirdStep({ payload, allRoles, mode }: UserThirdStepProps) {
   const { getValues } = useFormContext<CreateUserFormState>();
   const data = getValues();
+  const fullName = data.fullName;
 
   const hasAddress = data.zipCode || data.streetAddress || data.addressCity || data.addressState;
 
+  const alertTitle =
+    mode === "edit"
+      ? "Quase lá! Revise os dados antes de salvar as alterações."
+      : "Quase lá! Revise os dados antes de confirmar o cadastro.";
+
+  const alertDescription =
+    mode === "edit"
+      ? "Após a confirmação, as informações cadastrais e alocações do usuário serão atualizadas no sistema."
+      : "Após a confirmação, um e-mail de ativação será enviado ao endereço de e-mail informado. O usuário deverá clicar no link recebido para criar sua senha e acessar o sistema.";
+
   return (
     <Stack gap="lg">
-      <Alert
-        icon={<FaCheckCircle />}
-        title="Quase lá! Revise os dados antes de confirmar o cadastro."
-        color="green"
-        variant="light"
-        radius="md"
-      >
-        Após a confirmação, um e-mail de ativação será enviado ao endereço de e-mail informado. O
-        usuário deverá clicar no link recebido para criar sua senha e acessar o sistema.
+      {mode === "edit" && fullName && (
+        <Card
+          withBorder
+          padding="sm"
+          radius="md"
+          style={{
+            borderColor: "var(--primary)",
+            background: "color-mix(in srgb, var(--primary) 8%, transparent)",
+          }}
+        >
+          <Text size="sm" fw={600} c="var(--primary)">
+            Editando o usuário {fullName}
+          </Text>
+        </Card>
+      )}
+
+      <Alert icon={<FaCheckCircle />} title={alertTitle} color="green" variant="light" radius="md">
+        {alertDescription}
       </Alert>
 
       <Card withBorder padding="lg" radius="md">
@@ -195,34 +223,22 @@ export function CreateUserFinalStep({ payload, allRoles }: CreateUserFinalStepPr
         )}
       </Card>
 
-      <Card withBorder padding="lg" radius="md">
-        <Group gap="xs" mb="sm">
-          <FaIdCard size={12} color="var(--text-secondary)" />
-          <Text size="xs" fw={600} c="dimmed">
-            Payload de envio ao servidor
-          </Text>
-          <Badge size="xs" color="orange" variant="outline">
-            dev
-          </Badge>
-        </Group>
-        <ScrollArea.Autosize mah={260} type="auto">
-          <Code block style={{ fontSize: 11, whiteSpace: "pre" }}>
-            {JSON.stringify(payload, null, 2)}
-          </Code>
-        </ScrollArea.Autosize>
-      </Card>
 
       <Stack gap={4}>
         <Group gap="xs" align="center">
           <FaEnvelope size={12} color="var(--primary)" />
           <Text size="xs" c="var(--text-secondary)">
-            Um link de ativação será enviado ao e-mail <strong>{data.email}</strong>.
+            {mode === "edit"
+              ? `Os dados do usuário com e-mail ${data.email} serão atualizados.`
+              : `Um link de ativação será enviado ao e-mail ${data.email}.`}
           </Text>
         </Group>
         <Group gap="xs" align="center">
           <FaShieldAlt size={12} color="var(--secondary)" />
           <Text size="xs" c="var(--text-secondary)">
-            O acesso ao sistema só será liberado após a confirmação da conta pelo usuário.
+            {mode === "edit"
+              ? "As permissões e cargos do usuário passam a valer imediatamente após salvar."
+              : "O acesso ao sistema só será liberado após a confirmação da conta pelo usuário."}
           </Text>
         </Group>
       </Stack>

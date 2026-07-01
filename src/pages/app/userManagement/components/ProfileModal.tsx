@@ -2,6 +2,7 @@ import {
   Avatar,
   Badge,
   Box,
+  Button,
   Card,
   Divider,
   Group,
@@ -17,12 +18,14 @@ import {
   FaBriefcase,
   FaBuilding,
   FaClipboardList,
+  FaEdit,
   FaShieldAlt,
   FaUser,
 } from "react-icons/fa";
 import { getSelfData } from "../../../../services/users";
 import { useUserManagementStore } from "../../../../stores/app/userManagement";
 import { useAuthStore } from "../../../../stores/auth";
+import { useUtilsStore } from "../../../../stores/utils";
 import type { UserData } from "../../../../types/user";
 
 interface ProfileModalProps {
@@ -72,6 +75,7 @@ function InfoRow({ label, value }: { label: string; value?: string | null }) {
 
 export function ProfileModal({ opened, handleClose, targetId }: ProfileModalProps) {
   const { getUserDataByID, loading } = useUserManagementStore();
+  const { handleNavigation } = useUtilsStore();
   const { currentSession } = useAuthStore();
   const [user, setUser] = useState<UserData>();
   const [adress, setAdress] = useState<string>("");
@@ -89,6 +93,13 @@ export function ProfileModal({ opened, handleClose, targetId }: ProfileModalProp
     }
     setAdress(buildFullAdressString(userData));
     setUser(userData);
+  };
+
+  const handleEdit = () => {
+    const targetId = currentSession?.user?.id;
+    if (!targetId) return;
+    handleNavigation(`/users/edit/${targetId}`, "users.update");
+    handleClose();
   };
 
   const buildFullAdressString = (userData: UserData) => {
@@ -121,15 +132,14 @@ export function ProfileModal({ opened, handleClose, targetId }: ProfileModalProp
       ) : user ? (
         <Stack gap="md">
           <Stack align="center" gap="xs" my="md">
-            <Avatar key={user.fullName} variant="light" color="blue" size="80" radius="100%">
-              {user.fullName
-                ?.split(" ")
-                .filter(Boolean)
-                .slice(0, 2)
-                .map((n) => n[0])
-                .join("")
-                .toUpperCase() || "?"}
-            </Avatar>
+            <Avatar
+              key={user.fullName}
+              name={user.fullName}
+              variant="light"
+              color="initials"
+              size="80"
+              radius="100%"
+            />
             <Text fw={700} size="md" c="var(--text-main)" style={{ textAlign: "center" }}>
               {user.fullName}
             </Text>
@@ -137,6 +147,19 @@ export function ProfileModal({ opened, handleClose, targetId }: ProfileModalProp
               {user.email}
             </Text>
           </Stack>
+
+          {isAutenticadedUser && (
+            <Stack align="center" mt="-1.5rem">
+              <Button
+                variant="outline"
+                leftSection={<FaEdit size={16} />}
+                color="blue"
+                onClick={handleEdit}
+              >
+                Editar
+              </Button>
+            </Stack>
+          )}
 
           <Card withBorder padding="lg" radius="md">
             <SectionHeader

@@ -5,6 +5,7 @@ import {
   Group,
   Loader,
   MultiSelect,
+  SegmentedControl,
   Select,
   Text,
   Tooltip,
@@ -14,6 +15,7 @@ import type {
   CityOutput,
   FacilityOutput,
   PermissionOutput,
+  RoleCategory,
   RoleWithPermissionsOutput,
 } from "../../../../types/api.contracts";
 
@@ -43,6 +45,9 @@ interface AllocationBuilderProps {
 
   builderSelectedPermissions: string[];
   onPermissionToggle: (permId: string, checked: boolean) => void;
+
+  roleCategory: RoleCategory;
+  onRoleCategoryChange: (category: RoleCategory) => void;
 }
 
 export function AllocationBuilder({
@@ -59,10 +64,14 @@ export function AllocationBuilder({
   onRoleChange,
   builderSelectedPermissions,
   onPermissionToggle,
+  roleCategory,
+  onRoleCategoryChange,
 }: AllocationBuilderProps) {
   const myPermissionNames = new Set(myPermissions.map((p) => p.name));
 
-  const availableRoles = allRoles.filter((role) =>
+  const rolesInSelectedCategory = allRoles.filter((role) => role.category === roleCategory);
+
+  const availableRoles = rolesInSelectedCategory.filter((role) =>
     role.permissions.some((p) => myPermissionNames.has(p.name)),
   );
 
@@ -134,6 +143,21 @@ export function AllocationBuilder({
               3. Selecione o Cargo
             </Text>
           </Group>
+          <SegmentedControl
+            id="alloc-role-category"
+            value={roleCategory}
+            onChange={(val) => {
+              onRoleCategoryChange(val as RoleCategory);
+              onRoleChange(null);
+            }}
+            data={[
+              { label: "Funcional", value: "FUNCTIONAL" },
+              { label: "Administrativo", value: "ADMINISTRATIVE" },
+            ]}
+            fullWidth
+            mb="xs"
+            radius="md"
+          />
           <Select
             id="alloc-role-select"
             placeholder="Selecionar cargo..."
@@ -147,9 +171,9 @@ export function AllocationBuilder({
             value={builderRoleId}
             onChange={onRoleChange}
           />
-          {allRoles.length > availableRoles.length && (
+          {rolesInSelectedCategory.length > availableRoles.length && (
             <Text size="xs" c="dimmed" mt={4}>
-              {allRoles.length - availableRoles.length} cargo(s) oculto(s) por excederem suas
+              {rolesInSelectedCategory.length - availableRoles.length} cargo(s) deste tipo oculto(s) por excederem suas
               permissões.
             </Text>
           )}

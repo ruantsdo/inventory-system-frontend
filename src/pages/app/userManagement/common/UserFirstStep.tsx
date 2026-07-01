@@ -24,7 +24,11 @@ import { brazilianStates, professionalDocumentTypes } from "../../../../enums";
 import { useUtilsStore } from "../../../../stores/utils/utils.store";
 import type { CreateUserFormState } from "../../../../types/createUser";
 
-export function CreateUserFirstStep() {
+interface UserFirstStepProps {
+  mode?: "create" | "edit";
+}
+
+export function UserFirstStep({ mode }: UserFirstStepProps) {
   const {
     register,
     control,
@@ -54,9 +58,26 @@ export function CreateUserFirstStep() {
   };
 
   const hasProfessionalDocument = watch("hasProfessionalDocument");
+  const fullName = watch("fullName");
 
   return (
     <Stack gap="lg">
+      {mode === "edit" && fullName && (
+        <Card
+          withBorder
+          padding="sm"
+          radius="md"
+          style={{
+            borderColor: "var(--primary)",
+            background: "color-mix(in srgb, var(--primary) 8%, transparent)",
+          }}
+        >
+          <Text size="sm" fw={600} c="var(--primary)">
+            Editando o usuário {fullName}
+          </Text>
+        </Card>
+      )}
+
       <Card withBorder padding="lg" radius="md">
         <Group gap="xs" mb="md">
           <Box

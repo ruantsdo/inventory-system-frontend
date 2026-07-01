@@ -19,6 +19,7 @@ export const UsersDashboardPage = () => {
     setPage,
     setSearch,
     setStatusFilter,
+    refetch,
   } = useUsersDashboard();
 
   const totalPages = Math.ceil(total / pageSize);
@@ -71,7 +72,7 @@ export const UsersDashboardPage = () => {
         </Alert>
       )}
 
-      <UsersTable users={users} loading={loading} />
+      <UsersTable users={users} loading={loading} refetch={refetch} />
 
       {!loading && total > 0 && (
         <Group justify="space-between" align="center">
