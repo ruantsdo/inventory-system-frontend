@@ -7,6 +7,8 @@ import type {
 
 export interface ReferenceDataState {
   myPermissions: PermissionOutput[];
+  functionalRoles: RoleWithPermissionsOutput[];
+  administrativeRoles: RoleWithPermissionsOutput[];
   allRoles: RoleWithPermissionsOutput[];
   cities: CityOutput[];
 
@@ -15,6 +17,6 @@ export interface ReferenceDataState {
   referenceDataLoaded: boolean;
 
   loadReferenceData: () => Promise<void>;
-  getFacilitiesByCity: (cityId: string) => Promise<FacilityOutput[]>;
+  getActiveFacilitiesByCity: (cityId: string) => Promise<FacilityOutput[]>;
   reset: () => void;
 }

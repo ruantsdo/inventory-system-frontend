@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { router } from "../../routes";
+import { navigationHelper } from "../../utils";
 import { useAuthStore } from "../auth";
 import type { UtilsState } from "./utils.types";
 
@@ -29,6 +29,7 @@ export const useUtilsStore = create<UtilsState>((set) => ({
   checkPermission: (permissionName: string) => {
     const { currentSession } = useAuthStore.getState();
     if (!currentSession) return false;
+
     const effectivePermissions = currentSession.effectivePermissions;
     const autorized = effectivePermissions.some((ep) => ep.name === permissionName);
     return autorized;
@@ -37,7 +38,11 @@ export const useUtilsStore = create<UtilsState>((set) => ({
   handleNavigation: (path: string, permission: string) => {
     if (useUtilsStore.getState().checkPermission(permission)) {
       const absolutePath = path.startsWith("/") ? path : `/${path}`;
-      router.navigate(absolutePath);
+      if (navigationHelper.navigate) {
+        navigationHelper.navigate(absolutePath);
+      } else {
+        window.location.href = absolutePath;
+      }
     }
   },
 }));

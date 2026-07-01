@@ -1,11 +1,13 @@
 import { create } from "zustand";
-import { getFacilitiesByCity as fetchFacilitiesByCity } from "../../services/facilities";
+import { getActiveFacilitiesByCity } from "../../services/facilities";
 import { getCities } from "../../services/geo";
 import { getMyPermissions, getRoles } from "../../services/permissions";
 import type { ReferenceDataState } from "./referenceData.types";
 
 export const useReferenceDataStore = create<ReferenceDataState>((set, get) => ({
   myPermissions: [],
+  functionalRoles: [],
+  administrativeRoles: [],
   allRoles: [],
   cities: [],
 
@@ -25,10 +27,15 @@ export const useReferenceDataStore = create<ReferenceDataState>((set, get) => ({
         getCities(),
       ]);
 
+      const functionalRoles = roles.filter((role) => role.category === "FUNCTIONAL");
+      const administrativeRoles = roles.filter((role) => role.category === "ADMINISTRATIVE");
+
       set({
         myPermissions: perms,
-        allRoles: roles,
         cities: citiesData,
+        functionalRoles,
+        administrativeRoles,
+        allRoles: roles,
         referenceDataLoaded: true,
       });
     } catch {
@@ -40,9 +47,9 @@ export const useReferenceDataStore = create<ReferenceDataState>((set, get) => ({
     }
   },
 
-  getFacilitiesByCity: async (cityId: string) => {
+  getActiveFacilitiesByCity: async (cityId: string) => {
     try {
-      return await fetchFacilitiesByCity(cityId);
+      return await getActiveFacilitiesByCity(cityId);
     } catch {
       return [];
     }
@@ -51,6 +58,8 @@ export const useReferenceDataStore = create<ReferenceDataState>((set, get) => ({
   reset: () => {
     set({
       myPermissions: [],
+      functionalRoles: [],
+      administrativeRoles: [],
       allRoles: [],
       cities: [],
       referenceDataLoading: false,
