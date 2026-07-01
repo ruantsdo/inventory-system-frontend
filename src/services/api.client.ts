@@ -1,6 +1,7 @@
 import { notifications } from "@mantine/notifications";
 import type { InternalAxiosRequestConfig } from "axios";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export interface ApiError {
   status: number;
@@ -93,6 +94,31 @@ export const apiClient = axios.create({
   withCredentials: true,
   headers: { "Content-Type": "application/json" },
 });
+
+apiClient.interceptors.request.use(
+  async (config) => {
+    try {
+      const { useAuthStore } = await import("../stores/auth");
+      const session = useAuthStore.getState().currentSession;
+      const activeFacilityId = session?.activeContext?.facilityId;
+
+      if (activeFacilityId) {
+        Cookies.set("active_facility_id", activeFacilityId, {
+          expires: 365,
+          path: "/",
+          sameSite: "Lax",
+        });
+      } else {
+        Cookies.remove("active_facility_id", { path: "/" });
+      }
+    } catch (error) {
+      console.error("Erro ao sincronizar cookie active_facility_id:", error);
+    }
+
+    return config;
+  },
+  (error) => Promise.reject(error),
+);
 
 apiClient.interceptors.response.use(
   (response) => response,
