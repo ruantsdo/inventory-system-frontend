@@ -17,6 +17,6 @@ export async function getActiveFacilitiesByCity(cityId: string): Promise<Facilit
 }
 
 export async function getAllFacilitiesForSession(): Promise<FacilityForSession[]> {
-  const { data } = await apiClient.get("/api/facilities//active/session");
+  const { data } = await apiClient.get("/api/facilities/active/session");
   return data.facilities as FacilityForSession[];
 }
