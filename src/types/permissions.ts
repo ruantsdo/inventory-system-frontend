@@ -12,6 +12,7 @@ export interface Permission {
 }
 
 export interface Role {
+  id: ID;
   name: string;
   displayName: string;
   description?: string | null;

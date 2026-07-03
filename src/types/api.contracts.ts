@@ -65,14 +65,18 @@ export type ProfessionalDocumentType =
 
 export interface UserRolePayload {
   roleId: ID;
-  facilities?: ID[];
-  permissionIds?: ID[];
+  facilities: ID[];
+  permissionIds: ID[];
 }
 
 export interface UserProfessionalDocumentPayload {
   documentType: ProfessionalDocumentType;
   documentNumber: string;
+  issuer?: string;
   issuerState?: string;
+  issuedAt?: string;
+  expiresAt?: string;
+  notes?: string;
 }
 
 export interface CreateUserPayload {
@@ -82,14 +86,13 @@ export interface CreateUserPayload {
   birthDate: string;
   phone?: string | undefined;
 
-  cityId?: string | undefined;
-  zipCode?: string | undefined;
-  streetAddress?: string | undefined;
+  zipCode: string;
+  streetAddress: string;
   number?: string | undefined;
   additionalInfo?: string | undefined;
-  neighborhood?: string | undefined;
-  addressCity?: string | undefined;
-  state?: string | undefined;
+  neighborhood: string;
+  addressCity: string;
+  state: string;
 
   roles: UserRolePayload[];
   professionalDocuments?: UserProfessionalDocumentPayload[] | undefined;
@@ -123,14 +126,13 @@ export interface UpdateUserPayload {
   birthDate: string;
   phone?: string | undefined;
 
-  cityId?: string | undefined;
-  zipCode?: string | undefined;
-  streetAddress?: string | undefined;
+  zipCode: string;
+  streetAddress: string;
   number?: string | undefined;
   additionalInfo?: string | undefined;
-  neighborhood?: string | undefined;
-  addressCity?: string | undefined;
-  state?: string | undefined;
+  neighborhood: string;
+  addressCity: string;
+  state: string;
 
   roles: UserRolePayload[];
   professionalDocuments?: UserProfessionalDocumentPayload[] | undefined;
