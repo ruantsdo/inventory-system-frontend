@@ -1,5 +1,5 @@
 import { ActionIcon, Badge, Card, Group, Stack, Text } from "@mantine/core";
-import { FaBuilding, FaClipboardList, FaTrash } from "react-icons/fa";
+import { FaBuilding, FaClipboardList, FaEdit, FaTrash } from "react-icons/fa";
 import { FaLocationCrosshairs } from "react-icons/fa6";
 import type { RoleWithPermissionsOutput } from "../../../../types/api.contracts";
 import type { AllocationEntry } from "../../../../types/createUser";
@@ -8,9 +8,10 @@ interface AllocationListProps {
   allocations: AllocationEntry[];
   allRoles: RoleWithPermissionsOutput[];
   onRemove: (id: string) => void;
+  onEdit?: (id: string) => void;
 }
 
-export function AllocationList({ allocations, allRoles, onRemove }: AllocationListProps) {
+export function AllocationList({ allocations, allRoles, onRemove, onEdit }: AllocationListProps) {
   return (
     <Stack gap="sm">
       <Text fw={600} size="sm" c="var(--text-main)">
@@ -62,15 +63,28 @@ export function AllocationList({ allocations, allRoles, onRemove }: AllocationLi
                   : "Nenhuma permissão selecionada"}
               </Text>
             </Stack>
-            <ActionIcon
-              id={`remove-alloc-${alloc.id}`}
-              variant="subtle"
-              color="red"
-              size="sm"
-              onClick={() => onRemove(alloc.id)}
-            >
-              <FaTrash size={12} />
-            </ActionIcon>
+            <Group gap="xs">
+              {onEdit && (
+                <ActionIcon
+                  id={`edit-alloc-${alloc.id}`}
+                  variant="subtle"
+                  color="blue"
+                  size="sm"
+                  onClick={() => onEdit(alloc.id)}
+                >
+                  <FaEdit size={12} />
+                </ActionIcon>
+              )}
+              <ActionIcon
+                id={`remove-alloc-${alloc.id}`}
+                variant="subtle"
+                color="red"
+                size="sm"
+                onClick={() => onRemove(alloc.id)}
+              >
+                <FaTrash size={12} />
+              </ActionIcon>
+            </Group>
           </Group>
         </Card>
       ))}

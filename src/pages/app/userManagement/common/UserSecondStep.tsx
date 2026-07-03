@@ -1,8 +1,8 @@
 import { Box, Button, Card, Group, Loader, Stack, Text, Title } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { FaPlus, FaShieldAlt, FaTimesCircle } from "react-icons/fa";
+import { FaEdit, FaPlus, FaShieldAlt, FaTimesCircle } from "react-icons/fa";
 import { useReferenceDataStore } from "../../../../stores/utils";
 import type { FacilityOutput, RoleCategory } from "../../../../types/api.contracts";
 import type { AllocationEntry, CreateUserFormState } from "../../../../types/createUser";
@@ -38,6 +38,8 @@ export function UserSecondStep({ mode }: UserSecondStepProps) {
   const [builderSelectedFacilityIds, setBuilderSelectedFacilityIds] = useState<string[]>([]);
   const [builderRoleId, setBuilderRoleId] = useState<string | null>(null);
   const [builderSelectedPermissions, setBuilderSelectedPermissions] = useState<string[]>([]);
+  const [editingAllocId, setEditingAllocId] = useState<string | null>(null);
+  const skipAutoSelectRef = useRef(false);
 
   useEffect(() => {
     loadReferenceData();
@@ -71,13 +73,20 @@ export function UserSecondStep({ mode }: UserSecondStepProps) {
       setBuilderSelectedPermissions([]);
       return;
     }
+    if (skipAutoSelectRef.current) {
+      skipAutoSelectRef.current = false;
+      return;
+    }
     const role = allRoles.find((r) => r.id === builderRoleId);
     if (!role) return;
 
     const myPermissionNames = new Set(myPermissions.map((p) => p.name));
-    const autoSelected = role.permissions
-      .filter((p) => myPermissionNames.has(p.name))
-      .map((p) => p.id);
+    const canGrantFunctionalRoles = myPermissionNames.has("users.grant_functional_roles");
+    const isFunctionalBypass = canGrantFunctionalRoles && role.category === "FUNCTIONAL";
+
+    const autoSelected = isFunctionalBypass
+      ? role.permissions.map((p) => p.id)
+      : role.permissions.filter((p) => myPermissionNames.has(p.name)).map((p) => p.id);
 
     setBuilderSelectedPermissions(autoSelected);
   }, [builderRoleId, allRoles, myPermissions]);
@@ -92,22 +101,65 @@ export function UserSecondStep({ mode }: UserSecondStepProps) {
     const role = allRoles.find((r) => r.id === builderRoleId);
     if (!city || !role) return;
 
+    const duplicateFacilityNames = builderFacilities
+      .filter((f) => {
+        const isSelected = builderSelectedFacilityIds.includes(f.id);
+        if (!isSelected) return false;
+        return allocations.some(
+          (a) =>
+            a.id !== editingAllocId && a.roleId === builderRoleId && a.facilityIds.includes(f.id),
+        );
+      })
+      .map((f) => f.name);
+
+    if (duplicateFacilityNames.length > 0) {
+      notifications.show({
+        title: "Alocação Duplicada",
+        message: `O cargo "${role.displayName}" já está alocado para a(s) unidade(s) "${duplicateFacilityNames.join(
+          ", ",
+        )}" neste perfil de usuário.`,
+        color: "yellow",
+        autoClose: 10000,
+      });
+      return;
+    }
+
     const selectedFacilityNames = builderFacilities
       .filter((f) => builderSelectedFacilityIds.includes(f.id))
       .map((f) => f.name);
 
-    const newAllocation: AllocationEntry = {
-      id: `${crypto.randomUUID()}-${uniqueId}`,
-      roleId: builderRoleId,
-      roleDisplayName: role.displayName,
-      facilityIds: builderSelectedFacilityIds,
-      facilityNames: selectedFacilityNames,
-      cityId: builderCityId,
-      cityName: `${city.name}${city.state ? ` / ${city.state}` : ""}`,
-      permissionIds: builderSelectedPermissions,
-    };
+    if (editingAllocId) {
+      const updatedAllocations = allocations.map((a) => {
+        if (a.id === editingAllocId) {
+          return {
+            ...a,
+            roleId: builderRoleId,
+            roleDisplayName: role.displayName,
+            facilityIds: builderSelectedFacilityIds,
+            facilityNames: selectedFacilityNames,
+            cityId: builderCityId,
+            cityName: `${city.name}${city.state ? ` / ${city.state}` : ""}`,
+            permissionIds: builderSelectedPermissions,
+          };
+        }
+        return a;
+      });
+      setValue("allocations", updatedAllocations, { shouldValidate: true });
+      setEditingAllocId(null);
+    } else {
+      const newAllocation: AllocationEntry = {
+        id: `${crypto.randomUUID()}-${uniqueId}`,
+        roleId: builderRoleId,
+        roleDisplayName: role.displayName,
+        facilityIds: builderSelectedFacilityIds,
+        facilityNames: selectedFacilityNames,
+        cityId: builderCityId,
+        cityName: `${city.name}${city.state ? ` / ${city.state}` : ""}`,
+        permissionIds: builderSelectedPermissions,
+      };
 
-    setValue("allocations", [...allocations, newAllocation], { shouldValidate: true });
+      setValue("allocations", [...allocations, newAllocation], { shouldValidate: true });
+    }
 
     setBuilderCityId(null);
     setBuilderSelectedFacilityIds([]);
@@ -116,7 +168,37 @@ export function UserSecondStep({ mode }: UserSecondStepProps) {
     setRoleCategory("FUNCTIONAL");
   }
 
+  function handleEditAllocation(id: string) {
+    const alloc = allocations.find((a) => a.id === id);
+    if (!alloc) return;
+
+    setEditingAllocId(id);
+    skipAutoSelectRef.current = true;
+
+    const role = allRoles.find((r) => r.id === alloc.roleId);
+    if (role) {
+      setRoleCategory(role.category as RoleCategory);
+    }
+
+    setBuilderCityId(alloc.cityId);
+    setBuilderSelectedFacilityIds(alloc.facilityIds);
+    setBuilderRoleId(alloc.roleId);
+    setBuilderSelectedPermissions(alloc.permissionIds);
+  }
+
+  function handleCancelEdit() {
+    setEditingAllocId(null);
+    setBuilderCityId(null);
+    setBuilderSelectedFacilityIds([]);
+    setBuilderRoleId(null);
+    setBuilderSelectedPermissions([]);
+    setRoleCategory("FUNCTIONAL");
+  }
+
   function handleRemoveAllocation(id: string) {
+    if (editingAllocId === id) {
+      handleCancelEdit();
+    }
     setValue(
       "allocations",
       allocations.filter((a) => a.id !== id),
@@ -188,8 +270,9 @@ export function UserSecondStep({ mode }: UserSecondStepProps) {
         <Group gap="xs">
           <FaShieldAlt color="var(--secondary)" size={14} />
           <Text size="sm" c="var(--secondary)" fw={500}>
-            Você só pode atribuir permissões que você possui. Permissões que excedem as suas ficam
-            desabilitadas.
+            {myPermissions.some((p) => p.name === "users.grant_functional_roles")
+              ? "Você pode atribuir qualquer cargo funcional. Para cargos administrativos, apenas permissões que você possui podem ser concedidas."
+              : "Você só pode atribuir permissões que você possui. Permissões que excedem as suas ficam desabilitadas."}
           </Text>
         </Group>
       </Card>
@@ -201,16 +284,20 @@ export function UserSecondStep({ mode }: UserSecondStepProps) {
               width: 32,
               height: 32,
               borderRadius: 8,
-              background: "var(--primary)",
+              background: editingAllocId ? "var(--info-blue, #228be6)" : "var(--primary)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <FaPlus size={14} color="white" />
+            {editingAllocId ? (
+              <FaEdit size={14} color="white" />
+            ) : (
+              <FaPlus size={14} color="white" />
+            )}
           </Box>
           <Title order={5} c="var(--text-main)">
-            Nova Alocação
+            {editingAllocId ? "Editar Alocação" : "Nova Alocação"}
           </Title>
         </Group>
 
@@ -233,17 +320,39 @@ export function UserSecondStep({ mode }: UserSecondStepProps) {
             onRoleCategoryChange={setRoleCategory}
           />
 
-          <Button
-            id="alloc-add-btn"
-            leftSection={<FaPlus size={12} />}
-            color="green"
-            variant="light"
-            disabled={!canAddAllocation}
-            onClick={handleAddAllocation}
-            mt="sm"
-          >
-            Adicionar Alocação
-          </Button>
+          {editingAllocId ? (
+            <Group gap="sm" mt="sm">
+              <Button
+                id="alloc-save-btn"
+                leftSection={<FaEdit size={12} />}
+                color="blue"
+                disabled={!canAddAllocation}
+                onClick={handleAddAllocation}
+              >
+                Salvar Alterações
+              </Button>
+              <Button
+                id="alloc-cancel-btn"
+                variant="subtle"
+                color="gray"
+                onClick={handleCancelEdit}
+              >
+                Cancelar
+              </Button>
+            </Group>
+          ) : (
+            <Button
+              id="alloc-add-btn"
+              leftSection={<FaPlus size={12} />}
+              color="green"
+              variant="light"
+              disabled={!canAddAllocation}
+              onClick={handleAddAllocation}
+              mt="sm"
+            >
+              Adicionar Alocação
+            </Button>
+          )}
         </Stack>
       </Card>
 
@@ -252,6 +361,7 @@ export function UserSecondStep({ mode }: UserSecondStepProps) {
           allocations={allocations}
           allRoles={allRoles}
           onRemove={handleRemoveAllocation}
+          onEdit={handleEditAllocation}
         />
       )}
 

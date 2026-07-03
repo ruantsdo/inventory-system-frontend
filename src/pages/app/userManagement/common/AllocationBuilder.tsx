@@ -69,18 +69,23 @@ export function AllocationBuilder({
 }: AllocationBuilderProps) {
   const myPermissionNames = new Set(myPermissions.map((p) => p.name));
 
+  const canGrantFunctionalRoles = myPermissionNames.has("users.grant_functional_roles");
+
   const rolesInSelectedCategory = allRoles.filter((role) => role.category === roleCategory);
 
-  const availableRoles = rolesInSelectedCategory.filter((role) =>
-    role.permissions.some((p) => myPermissionNames.has(p.name)),
-  );
+  const availableRoles = rolesInSelectedCategory.filter((role) => {
+    if (canGrantFunctionalRoles && role.category === "FUNCTIONAL") return true;
+    return role.permissions.some((p) => myPermissionNames.has(p.name));
+  });
 
   const selectedRole = allRoles.find((r) => r.id === builderRoleId) ?? null;
+
+  const isFunctionalBypass = canGrantFunctionalRoles && selectedRole?.category === "FUNCTIONAL";
 
   const rolePermissions: PermissionWithGrant[] =
     selectedRole?.permissions.map((p) => ({
       ...p,
-      canGrant: myPermissionNames.has(p.name),
+      canGrant: isFunctionalBypass ? true : myPermissionNames.has(p.name),
     })) ?? [];
 
   return (
@@ -171,7 +176,8 @@ export function AllocationBuilder({
             value={builderRoleId}
             onChange={onRoleChange}
           />
-          {rolesInSelectedCategory.length > availableRoles.length && (
+          {rolesInSelectedCategory.length > availableRoles.length &&
+            !(canGrantFunctionalRoles && roleCategory === "FUNCTIONAL") && (
             <Text size="xs" c="dimmed" mt={4}>
               {rolesInSelectedCategory.length - availableRoles.length} cargo(s) deste tipo oculto(s) por excederem suas
               permissões.
