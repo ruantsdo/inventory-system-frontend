@@ -1,14 +1,5 @@
-import {
-  Alert,
-  Badge,
-  Box,
-  Card,
-  Divider,
-  Group,
-  Stack,
-  Text,
-  ThemeIcon,
-} from "@mantine/core";
+import { Alert, Badge, Box, Card, Divider, Group, Stack, Text, ThemeIcon } from "@mantine/core";
+import dayjs from "dayjs";
 import { useFormContext } from "react-hook-form";
 import {
   FaAddressCard,
@@ -155,10 +146,46 @@ export function UserThirdStep({ payload, allRoles, mode }: UserThirdStepProps) {
           label="Documentação Profissional"
           color="#8b5cf6"
         />
-        {data.hasProfessionalDocument && data.documentType && data.documentNumber ? (
-          <Stack gap={8}>
-            <InfoRow label="Tipo" value={data.documentType} />
-            <InfoRow label="Número" value={data.documentNumber} />
+        {data.hasProfessionalDocument &&
+        data.professionalDocuments &&
+        data.professionalDocuments.length > 0 ? (
+          <Stack gap="md">
+            {data.professionalDocuments.map((doc, idx) => (
+              <Box key={doc.id || idx}>
+                {idx > 0 && <Divider my="xs" />}
+                <Stack gap={4}>
+                  <Group gap="xs">
+                    <Badge color="violet" variant="light">
+                      {doc.documentType}
+                    </Badge>
+                    <Text size="sm" fw={600}>
+                      {doc.documentNumber}
+                    </Text>
+                    {doc.issuerState && (
+                      <Badge color="gray" variant="outline" size="xs">
+                        {doc.issuerState}
+                      </Badge>
+                    )}
+                  </Group>
+                  <Stack gap={2} mt={2}>
+                    {doc.issuer && <InfoRow label="Órgão Emissor" value={doc.issuer} />}
+                    {doc.issuedAt && (
+                      <InfoRow
+                        label="Data de Emissão"
+                        value={dayjs(doc.issuedAt).format("DD/MM/YYYY")}
+                      />
+                    )}
+                    {doc.expiresAt && (
+                      <InfoRow
+                        label="Data de Validade"
+                        value={dayjs(doc.expiresAt).format("DD/MM/YYYY")}
+                      />
+                    )}
+                    {doc.notes && <InfoRow label="Observações" value={doc.notes} />}
+                  </Stack>
+                </Stack>
+              </Box>
+            ))}
           </Stack>
         ) : (
           <Text size="sm" c="dimmed" fs="italic">
@@ -222,7 +249,6 @@ export function UserThirdStep({ payload, allRoles, mode }: UserThirdStepProps) {
           </Stack>
         )}
       </Card>
-
 
       <Stack gap={4}>
         <Group gap="xs" align="center">

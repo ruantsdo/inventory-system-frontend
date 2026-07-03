@@ -71,8 +71,17 @@ export function EditUserPage() {
 
     getUserDataForEdit(userId)
       .then((data) => {
-        const firstDoc = data.professionalDocuments?.[0] || null;
-        const hasProfessionalDocument = !!firstDoc;
+        const professionalDocuments = data.professionalDocuments?.map((doc) => ({
+          id: `${crypto.randomUUID()}-edit`,
+          documentType: doc.documentType,
+          documentNumber: doc.documentNumber,
+          issuer: doc.issuer || "",
+          issuerState: doc.issuerState || "",
+          issuedAt: doc.issuedAt ? doc.issuedAt.substring(0, 10) : "",
+          expiresAt: doc.expiresAt ? doc.expiresAt.substring(0, 10) : "",
+          notes: doc.notes || "",
+        })) || [];
+        const hasProfessionalDocument = professionalDocuments.length > 0;
 
         const allocations = data.roles.flatMap((r) => {
           if (!r.facilityDetails || r.facilityDetails.length === 0) {
@@ -125,10 +134,15 @@ export function EditUserPage() {
           neighborhood: data.neighborhood || "",
           addressCity: data.addressCity || "",
           addressState: data.state || "",
-          cityId: "",
           hasProfessionalDocument,
-          documentType: firstDoc ? firstDoc.documentType : "",
-          documentNumber: firstDoc ? firstDoc.documentNumber : "",
+          documentType: "",
+          documentNumber: "",
+          documentIssuer: "",
+          documentIssuerState: "",
+          documentIssuedAt: null,
+          documentExpiresAt: null,
+          documentNotes: "",
+          professionalDocuments,
           allocations,
         });
       })
@@ -158,6 +172,7 @@ export function EditUserPage() {
         "hasProfessionalDocument",
         "documentType",
         "documentNumber",
+        "professionalDocuments",
       ]);
       if (!isValid) return;
     } else if (activeStep === 1) {

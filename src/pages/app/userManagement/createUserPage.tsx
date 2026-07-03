@@ -57,6 +57,7 @@ export function CreateUserPage() {
         "hasProfessionalDocument",
         "documentType",
         "documentNumber",
+        "professionalDocuments",
       ]);
       if (!isValid) return;
     } else if (activeStep === 1) {

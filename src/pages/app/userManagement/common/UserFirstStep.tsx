@@ -1,6 +1,8 @@
 import {
+  ActionIcon,
   Badge,
   Box,
+  Button,
   Card,
   Checkbox,
   Grid,
@@ -18,10 +20,11 @@ import "dayjs/locale/pt-br";
 import dayjs from "dayjs";
 import { useRef } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { FaAddressCard, FaFileAlt, FaUser } from "react-icons/fa";
+import { FaAddressCard, FaFileAlt, FaTrash, FaUser } from "react-icons/fa";
 import { withMask } from "use-mask-input";
 import { brazilianStates, professionalDocumentTypes } from "../../../../enums";
 import { useUtilsStore } from "../../../../stores/utils/utils.store";
+import type { ProfessionalDocumentType } from "../../../../types/api.contracts";
 import type { CreateUserFormState } from "../../../../types/createUser";
 
 interface UserFirstStepProps {
@@ -55,6 +58,65 @@ export function UserFirstStep({ mode }: UserFirstStepProps) {
         }
       }, 600);
     }
+  };
+
+  const handleToggleHasProfessionalDocument = (checked: boolean) => {
+    if (!checked) {
+      setValue("documentType", "");
+      setValue("documentNumber", "");
+      setValue("documentIssuer", "");
+      setValue("documentIssuerState", "");
+      setValue("documentIssuedAt", null);
+      setValue("documentExpiresAt", null);
+      setValue("documentNotes", "");
+      setValue("professionalDocuments", []);
+    }
+  };
+
+  const handleAddProfessionalDocument = () => {
+    const docType = watch("documentType");
+    const docNum = watch("documentNumber");
+    if (!docType || !docNum || !docNum.trim()) return;
+
+    const docs = watch("professionalDocuments") || [];
+    const isDuplicate = docs.some(
+      (d) => d.documentType === docType && d.documentNumber === docNum.trim(),
+    );
+    if (isDuplicate) return;
+
+    const issuer = watch("documentIssuer");
+    const issuerState = watch("documentIssuerState");
+    const issuedAt = watch("documentIssuedAt");
+    const expiresAt = watch("documentExpiresAt");
+    const notes = watch("documentNotes");
+
+    const issuedAtStr = issuedAt ? dayjs(issuedAt).format("YYYY-MM-DD") : undefined;
+    const expiresAtStr = expiresAt ? dayjs(expiresAt).format("YYYY-MM-DD") : undefined;
+
+    setValue(
+      "professionalDocuments",
+      [
+        ...docs,
+        {
+          id: `${crypto.randomUUID()}-doc`,
+          documentType: docType as ProfessionalDocumentType,
+          documentNumber: docNum.trim(),
+          issuer: issuer || undefined,
+          issuerState: issuerState || undefined,
+          issuedAt: issuedAtStr,
+          expiresAt: expiresAtStr,
+          notes: notes || undefined,
+        },
+      ],
+      { shouldValidate: true },
+    );
+    setValue("documentType", "");
+    setValue("documentNumber", "");
+    setValue("documentIssuer", "");
+    setValue("documentIssuerState", "");
+    setValue("documentIssuedAt", null);
+    setValue("documentExpiresAt", null);
+    setValue("documentNotes", "");
   };
 
   const hasProfessionalDocument = watch("hasProfessionalDocument");
@@ -348,46 +410,194 @@ export function UserFirstStep({ mode }: UserFirstStepProps) {
                 checked={field.value}
                 onChange={(e) => {
                   field.onChange(e.currentTarget.checked);
-                  if (!e.currentTarget.checked) {
-                    setValue("documentType", "");
-                    setValue("documentNumber", "");
-                  }
+                  handleToggleHasProfessionalDocument(e.currentTarget.checked);
                 }}
               />
             )}
           />
 
           {hasProfessionalDocument && (
-            <Grid gutter="md">
-              <Grid.Col span={{ base: 12, sm: 5 }}>
-                <Controller
-                  name="documentType"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      id="create-user-doc-type"
-                      label="Tipo de Documento"
-                      placeholder="Selecione o conselho"
-                      required={hasProfessionalDocument}
-                      data={[...professionalDocumentTypes]}
-                      error={errors.documentType?.message}
-                      searchable
-                    />
-                  )}
-                />
-              </Grid.Col>
-              <Grid.Col span={{ base: 12, sm: 7 }}>
-                <TextInput
-                  {...register("documentNumber")}
-                  id="create-user-doc-number"
-                  label="Número do Documento"
-                  placeholder="Ex: 123456 / SP"
-                  required={hasProfessionalDocument}
-                  error={errors.documentNumber?.message}
-                />
-              </Grid.Col>
-            </Grid>
+            <Stack gap="md">
+              <Grid gutter="sm">
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <Controller
+                    name="documentType"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        id="create-user-doc-type"
+                        label="Tipo de Documento"
+                        placeholder="Selecione o conselho"
+                        data={[...professionalDocumentTypes]}
+                        searchable
+                      />
+                    )}
+                  />
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <TextInput
+                    {...register("documentNumber")}
+                    id="create-user-doc-number"
+                    label="Número do Documento"
+                    placeholder="Ex: 123456"
+                  />
+                </Grid.Col>
+
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <TextInput
+                    {...register("documentIssuer")}
+                    id="create-user-doc-issuer"
+                    label="Órgão Emissor"
+                    placeholder="Ex: CRM-SP, COREN-RJ"
+                  />
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <Controller
+                    name="documentIssuerState"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        id="create-user-doc-issuer-state"
+                        label="UF Emissora"
+                        placeholder="Selecione o Estado"
+                        data={[...brazilianStates]}
+                        searchable
+                        clearable
+                      />
+                    )}
+                  />
+                </Grid.Col>
+
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <Controller
+                    name="documentIssuedAt"
+                    control={control}
+                    render={({ field }) => (
+                      <DateInput
+                        {...field}
+                        id="create-user-doc-issued-at"
+                        label="Data de Emissão"
+                        placeholder="Selecione a data"
+                        clearable
+                        locale="pt-br"
+                        valueFormat="DD/MM/YYYY"
+                      />
+                    )}
+                  />
+                </Grid.Col>
+                <Grid.Col span={{ base: 12, sm: 6 }}>
+                  <Controller
+                    name="documentExpiresAt"
+                    control={control}
+                    render={({ field }) => (
+                      <DateInput
+                        {...field}
+                        id="create-user-doc-expires-at"
+                        label="Data de Validade"
+                        placeholder="Selecione a data"
+                        clearable
+                        locale="pt-br"
+                        valueFormat="DD/MM/YYYY"
+                      />
+                    )}
+                  />
+                </Grid.Col>
+
+                <Grid.Col span={12}>
+                  <TextInput
+                    {...register("documentNotes")}
+                    id="create-user-doc-notes"
+                    label="Observações"
+                    placeholder="Ex: Registro temporário, especialidade, etc."
+                  />
+                </Grid.Col>
+              </Grid>
+
+              <Button
+                id="add-doc-btn"
+                color="green"
+                variant="light"
+                onClick={handleAddProfessionalDocument}
+              >
+                Adicionar Documento
+              </Button>
+
+              {(watch("professionalDocuments") || []).length > 0 && (
+                <Stack gap="xs" mt="sm">
+                  <Text fw={600} size="sm" c="var(--text-main)">
+                    Documentos Adicionados
+                  </Text>
+                  {(watch("professionalDocuments") || []).map((doc) => (
+                    <Card key={doc.id} withBorder padding="md" radius="md">
+                      <Group justify="space-between" align="flex-start">
+                        <Stack gap={4} style={{ flex: 1 }}>
+                          <Group gap="xs">
+                            <Badge color="violet" variant="light">
+                              {doc.documentType}
+                            </Badge>
+                            <Text size="sm" fw={600}>
+                              {doc.documentNumber}
+                            </Text>
+                            {doc.issuerState && (
+                              <Badge color="gray" variant="outline" size="xs">
+                                {doc.issuerState}
+                              </Badge>
+                            )}
+                          </Group>
+                          <Stack gap={2} mt={4}>
+                            {doc.issuer && (
+                              <Text size="xs" c="dimmed">
+                                <strong>Emissor:</strong> {doc.issuer}
+                              </Text>
+                            )}
+                            {doc.issuedAt && (
+                              <Text size="xs" c="dimmed">
+                                <strong>Emissão:</strong> {dayjs(doc.issuedAt).format("DD/MM/YYYY")}
+                              </Text>
+                            )}
+                            {doc.expiresAt && (
+                              <Text size="xs" c="dimmed">
+                                <strong>Vencimento:</strong>{" "}
+                                {dayjs(doc.expiresAt).format("DD/MM/YYYY")}
+                              </Text>
+                            )}
+                            {doc.notes && (
+                              <Text size="xs" c="dimmed" style={{ fontStyle: "italic" }}>
+                                <strong>Observações:</strong> {doc.notes}
+                              </Text>
+                            )}
+                          </Stack>
+                        </Stack>
+                        <ActionIcon
+                          id={`remove-doc-${doc.id}`}
+                          variant="subtle"
+                          color="red"
+                          size="sm"
+                          onClick={() => {
+                            const docs = watch("professionalDocuments") || [];
+                            setValue(
+                              "professionalDocuments",
+                              docs.filter((d) => d.id !== doc.id),
+                              { shouldValidate: true },
+                            );
+                          }}
+                        >
+                          <FaTrash size={12} />
+                        </ActionIcon>
+                      </Group>
+                    </Card>
+                  ))}
+                </Stack>
+              )}
+
+              {errors.professionalDocuments?.message && (
+                <Text size="xs" c="var(--status-error)">
+                  {errors.professionalDocuments.message}
+                </Text>
+              )}
+            </Stack>
           )}
         </Stack>
       </Card>

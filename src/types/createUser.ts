@@ -12,6 +12,17 @@ export interface AllocationEntry {
   permissionIds: string[];
 }
 
+export interface ProfessionalDocumentEntry {
+  id: string;
+  documentType: ProfessionalDocumentType | "";
+  documentNumber: string;
+  issuer?: string;
+  issuerState?: string;
+  issuedAt?: string;
+  expiresAt?: string;
+  notes?: string;
+}
+
 export interface CreateUserFormState {
   fullName: string;
   birthDate: string;
@@ -27,11 +38,15 @@ export interface CreateUserFormState {
   addressCity: string;
   addressState: string;
 
-  cityId: string;
-
   hasProfessionalDocument: boolean;
   documentType: ProfessionalDocumentType | "";
   documentNumber: string;
+  documentIssuer: string;
+  documentIssuerState: string;
+  documentIssuedAt: Date | null;
+  documentExpiresAt: Date | null;
+  documentNotes: string;
+  professionalDocuments: ProfessionalDocumentEntry[];
 
   allocations: AllocationEntry[];
 }
@@ -51,10 +66,15 @@ export const EMPTY_FORM_STATE: CreateUserFormState = {
   neighborhood: "",
   addressCity: "",
   addressState: "",
-  cityId: "",
   hasProfessionalDocument: false,
   documentType: "",
   documentNumber: "",
+  documentIssuer: "",
+  documentIssuerState: "",
+  documentIssuedAt: null,
+  documentExpiresAt: null,
+  documentNotes: "",
+  professionalDocuments: [],
   allocations: [],
 };
 

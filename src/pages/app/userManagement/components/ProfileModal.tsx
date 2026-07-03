@@ -12,6 +12,7 @@ import {
   Text,
   ThemeIcon,
 } from "@mantine/core";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import {
   FaAddressCard,
@@ -205,7 +206,21 @@ export function ProfileModal({ opened, handleClose, targetId }: ProfileModalProp
                     <Stack gap={8}>
                       <InfoRow label="Tipo de Documento" value={doc.documentType} />
                       <InfoRow label="Número do Registro" value={doc.documentNumber} />
-                      <InfoRow label="UF Emissora" value={doc.issuerState || null} />
+                      {doc.issuer && <InfoRow label="Órgão Emissor" value={doc.issuer} />}
+                      {doc.issuerState && <InfoRow label="UF Emissora" value={doc.issuerState} />}
+                      {doc.issuedAt && (
+                        <InfoRow
+                          label="Data de Emissão"
+                          value={dayjs(doc.issuedAt).format("DD/MM/YYYY")}
+                        />
+                      )}
+                      {doc.expiresAt && (
+                        <InfoRow
+                          label="Data de Validade"
+                          value={dayjs(doc.expiresAt).format("DD/MM/YYYY")}
+                        />
+                      )}
+                      {doc.notes && <InfoRow label="Observações" value={doc.notes} />}
                     </Stack>
                   </Box>
                 ))}

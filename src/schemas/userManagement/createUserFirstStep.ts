@@ -14,25 +14,36 @@ export const createUserStep1Schema = z
     phone: z.string(),
     addressNumber: z.string(),
     additionalInfo: z.string(),
-    cityId: z.string(),
     hasProfessionalDocument: z.boolean(),
-    documentType: z.string() as z.ZodType<import("../../types/api.contracts").ProfessionalDocumentType | "">,
-    documentNumber: z.string(),
+    documentType: z.string().optional(),
+    documentNumber: z.string().optional(),
+    documentIssuer: z.string().optional(),
+    documentIssuerState: z.string().optional(),
+    documentIssuedAt: z.any().optional(),
+    documentExpiresAt: z.any().optional(),
+    documentNotes: z.string().optional(),
+    professionalDocuments: z
+      .array(
+        z.object({
+          id: z.string(),
+          documentType: z.string().min(1, "Selecione o tipo do documento."),
+          documentNumber: z.string().min(1, "Informe o número do documento."),
+          issuer: z.string().optional(),
+          issuerState: z.string().optional(),
+          issuedAt: z.string().optional(),
+          expiresAt: z.string().optional(),
+          notes: z.string().optional(),
+        })
+      )
+      .default([]),
   })
   .superRefine((data, ctx) => {
     if (data.hasProfessionalDocument) {
-      if (!data.documentType) {
+      if (!data.professionalDocuments || data.professionalDocuments.length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          path: ["documentType"],
-          message: "Selecione o tipo de documento.",
-        });
-      }
-      if (!data.documentNumber.trim()) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ["documentNumber"],
-          message: "Informe o número do documento.",
+          path: ["professionalDocuments"],
+          message: "Adicione pelo menos um documento especial para continuar.",
         });
       }
     }

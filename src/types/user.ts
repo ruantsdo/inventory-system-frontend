@@ -29,7 +29,11 @@ export interface UserRolePayload {
 export interface UserProfessionalDocumentPayload {
   documentType: ProfessionalDocumentType;
   documentNumber: string;
+  issuer?: string;
   issuerState?: string;
+  issuedAt?: string;
+  expiresAt?: string;
+  notes?: string;
 }
 
 export interface UserData {
