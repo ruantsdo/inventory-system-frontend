@@ -2,7 +2,7 @@ import type { RouteObject } from "react-router";
 import { AppLayout } from "../layouts/AppLayout";
 import { HomePage } from "../pages/app";
 import { CreateUserPage, EditUserPage, UsersDashboardPage } from "../pages/app/";
-import { NotFoundPage } from "../pages/public";
+import { NotFoundPage } from "../public/pages";
 
 export const appRoutes: RouteObject[] = [
   {

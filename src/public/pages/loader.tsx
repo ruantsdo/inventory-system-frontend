@@ -21,7 +21,12 @@ export function LoaderPage() {
         </Stack>
       </Box>
       <Box className="w-[600px]">
-        <DotLottieReact src="src/assets/animations/pageLoader.lottie" speed={0.4} loop autoplay />
+        <DotLottieReact
+          src="src/public/assets/animations/pageLoader.lottie"
+          speed={0.4}
+          loop
+          autoplay
+        />
       </Box>
     </Box>
   );

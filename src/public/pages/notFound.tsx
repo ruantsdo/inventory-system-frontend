@@ -27,7 +27,7 @@ export function NotFoundPage() {
         </Stack>
       </Box>
       <Box className="w-[600px]">
-        <DotLottieReact src="src/assets/animations/404.lottie" speed={0.4} loop autoplay />
+        <DotLottieReact src="src/public/assets/animations/404.lottie" speed={0.4} loop autoplay />
       </Box>
       <Button
         mt="lg"

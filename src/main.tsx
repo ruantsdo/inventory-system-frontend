@@ -10,7 +10,7 @@ import { Notifications } from "@mantine/notifications";
 
 import { RouterProvider } from "react-router";
 import { ErrorBoundary } from "./components";
-import { LoaderPage } from "./pages/public";
+import { LoaderPage } from "./public/pages";
 import { router } from "./routes/";
 import { useAuthStore } from "./stores/auth";
 

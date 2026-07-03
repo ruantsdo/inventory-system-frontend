@@ -1,5 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router";
-import { LoaderPage } from "../../pages/public";
+import { LoaderPage } from "../../public/pages";
 import { selectHasCheckedAuth, selectIsAuthenticated, useAuthStore } from "../../stores/auth";
 
 export const AuthGuard = () => {
