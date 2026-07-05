@@ -13,11 +13,10 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { FaEdit, FaEye, FaPause, FaPlay, FaTrash } from "react-icons/fa";
-import { useUserManagementStore } from "../../../../../stores/app/userManagement";
 import { useUtilsStore } from "../../../../../stores/utils";
 import type { UserListItem } from "../../../../../types/usersDashboard";
-import { DeleteUserConfirmModal } from "../DeleteConfirmationModal";
 import { ProfileModal } from "../ProfileModal";
+import { UserActionConfirmModal } from "../UserActionConfirmModal";
 
 interface UsersTableProps {
   users: UserListItem[];
@@ -40,7 +39,6 @@ function UserRowSkeleton() {
 
 export function UsersTable({ users, loading, refetch }: UsersTableProps) {
   const { checkPermission, handleNavigation } = useUtilsStore();
-  const { reactivateUser, deactivateUser } = useUserManagementStore();
 
   const canUpdate = checkPermission("users.update");
   const canDelete = checkPermission("users.delete");
@@ -50,8 +48,11 @@ export function UsersTable({ users, loading, refetch }: UsersTableProps) {
   const [opened, { open, close }] = useDisclosure(false);
   const [userId, setTargetId] = useState<string>("");
 
-  const [deleteOpened, setDeleteOpened] = useState(false);
-  const [targetToDelete, setTargetToDelete] = useState<UserListItem>();
+  const [confirmModalOpened, setConfirmModalOpened] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<"delete" | "deactivate" | "reactivate">(
+    "delete",
+  );
+  const [targetUser, setTargetUser] = useState<UserListItem>();
 
   const handleProfileModal = (userId: string) => {
     if (opened) {
@@ -62,22 +63,16 @@ export function UsersTable({ users, loading, refetch }: UsersTableProps) {
     }
   };
 
-  const handleDeleteModal = (user: UserListItem) => {
-    if (deleteOpened) {
-      setDeleteOpened(false);
-    } else {
-      setTargetToDelete(user);
-      setDeleteOpened(true);
-    }
+  const handleDeleteClick = (user: UserListItem) => {
+    setTargetUser(user);
+    setConfirmAction("delete");
+    setConfirmModalOpened(true);
   };
 
-  const handleChangeUserState = async (user: UserListItem) => {
-    if (user.isActive) {
-      await deactivateUser(user.id);
-    } else {
-      await reactivateUser(user.id);
-    }
-    await refetch();
+  const handleChangeUserState = (user: UserListItem) => {
+    setTargetUser(user);
+    setConfirmAction(user.isActive ? "deactivate" : "reactivate");
+    setConfirmModalOpened(true);
   };
 
   const rows = loading
@@ -171,7 +166,7 @@ export function UsersTable({ users, loading, refetch }: UsersTableProps) {
                     color="red"
                     size="sm"
                     radius="md"
-                    onClick={() => handleDeleteModal(user)}
+                    onClick={() => handleDeleteClick(user)}
                   >
                     <FaTrash size={13} />
                   </ActionIcon>
@@ -222,11 +217,12 @@ export function UsersTable({ users, loading, refetch }: UsersTableProps) {
         </Table.Tbody>
       </Table>
       {opened && <ProfileModal opened={opened} handleClose={close} targetId={userId} />}
-      {deleteOpened && targetToDelete && (
-        <DeleteUserConfirmModal
-          deleteOpened={deleteOpened}
-          setDeleteOpened={setDeleteOpened}
-          user={targetToDelete}
+      {confirmModalOpened && targetUser && (
+        <UserActionConfirmModal
+          opened={confirmModalOpened}
+          onClose={() => setConfirmModalOpened(false)}
+          user={targetUser}
+          action={confirmAction}
           onSuccess={refetch}
         />
       )}
