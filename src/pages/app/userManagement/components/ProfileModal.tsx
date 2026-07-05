@@ -12,7 +12,6 @@ import {
   Text,
   ThemeIcon,
 } from "@mantine/core";
-import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import {
   FaAddressCard,
@@ -28,6 +27,7 @@ import { useUserManagementStore } from "../../../../stores/app/userManagement";
 import { useAuthStore } from "../../../../stores/auth";
 import { useUtilsStore } from "../../../../stores/utils";
 import type { UserData } from "../../../../types/user";
+import { formatToBrDate } from "../../../../utils/date.utils";
 
 interface ProfileModalProps {
   opened: boolean;
@@ -170,7 +170,7 @@ export function ProfileModal({ opened, handleClose, targetId }: ProfileModalProp
             />
             <Stack gap={8}>
               <InfoRow label="Nome Completo" value={user.fullName} />
-              <InfoRow label="Data de Nascimento" value={user.birthDate} />
+              <InfoRow label="Data de Nascimento" value={formatToBrDate(user.birthDate)} />
               <InfoRow label="CPF" value={user.cpf} />
               <InfoRow label="Telefone" value={user.phone || null} />
               <InfoRow label="E-mail" value={user.email} />
@@ -209,16 +209,10 @@ export function ProfileModal({ opened, handleClose, targetId }: ProfileModalProp
                       {doc.issuer && <InfoRow label="Órgão Emissor" value={doc.issuer} />}
                       {doc.issuerState && <InfoRow label="UF Emissora" value={doc.issuerState} />}
                       {doc.issuedAt && (
-                        <InfoRow
-                          label="Data de Emissão"
-                          value={dayjs(doc.issuedAt).format("DD/MM/YYYY")}
-                        />
+                        <InfoRow label="Data de Emissão" value={formatToBrDate(doc.issuedAt)} />
                       )}
                       {doc.expiresAt && (
-                        <InfoRow
-                          label="Data de Validade"
-                          value={dayjs(doc.expiresAt).format("DD/MM/YYYY")}
-                        />
+                        <InfoRow label="Data de Validade" value={formatToBrDate(doc.expiresAt)} />
                       )}
                       {doc.notes && <InfoRow label="Observações" value={doc.notes} />}
                     </Stack>

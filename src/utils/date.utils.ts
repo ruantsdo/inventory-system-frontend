@@ -1,9 +1,11 @@
+import dayjs from "dayjs";
+
 export function formatBrDateToIso(dateStr: string): string {
   if (!dateStr) return "";
-  const parts = dateStr.split("/");
-  if (parts.length === 3) {
-    const [day, month, year] = parts;
-    return `${year}-${month}-${day}`;
-  }
-  return dateStr;
+  return dayjs(dateStr).format("YYYY-MM-DD");
+}
+
+export function formatToBrDate(dateStr: string): string {
+  if (!dateStr) return "";
+  return dayjs(dateStr).format("DD/MM/YYYY");
 }
