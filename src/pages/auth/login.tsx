@@ -24,7 +24,7 @@ import { ThemeToggle } from "../../components";
 import { type LoginRequest, loginSchema } from "../../schemas/auth";
 import { selectIsAuthenticated, selectIsLoading, useAuthStore } from "../../stores/auth";
 
-const LoginPage = () => {
+export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const login = useAuthStore((s) => s.login);
@@ -138,24 +138,24 @@ const LoginPage = () => {
                       value={
                         isAutofilled ? maskAutofilledCpf(savedData?.credential || "") : field.value
                       }
-                      onChange={(e: any) => {
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         if (isAutofilled) {
                           setIsAutofilled(false);
                           const firstTwo = savedData?.credential?.substring(0, 2) || "";
-                          const typedChar = e.nativeEvent?.data?.replace(/\D/g, "") || "";
+                          const typedChar = (e.nativeEvent as InputEvent)?.data?.replace(/\D/g, "") || "";
                           field.onChange(firstTwo + typedChar);
                         } else {
                           field.onChange(e);
                         }
                       }}
-                      onKeyDown={(e: any) => {
+                      onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                         if (isAutofilled && (e.key === "Backspace" || e.key === "Delete")) {
                           setIsAutofilled(false);
                           field.onChange(savedData?.credential?.substring(0, 2) || "");
                           e.preventDefault();
                         }
                       }}
-                      ref={(element: any) => {
+                      ref={(element: HTMLInputElement | null) => {
                         field.ref(element);
 
                         if (element && !isAutofilled) {
@@ -228,6 +228,5 @@ const LoginPage = () => {
       </Container>
     </Box>
   );
-};
+}
 
-export default LoginPage;

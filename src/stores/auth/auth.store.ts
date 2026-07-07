@@ -8,18 +8,21 @@ import type {
   ResetPasswordSecondStepRequest,
 } from "../../schemas/auth";
 import { authService } from "../../services/auth";
-import type { AuthState, AuthUser } from "./";
+import { getAllFacilitiesForSession } from "../../services/facilities";
+import type { AuthSession } from "../../types/permissions";
+import type { AuthState } from "./";
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-      user: null,
+      currentSession: null,
       isLoading: false,
       hasCheckedAuth: false,
+      isRevalidating: false,
       errorMessage: null,
 
-      setUser: (user: AuthUser | null) => {
-        set({ user });
+      setCurrentSession: (session: AuthSession | null) => {
+        set({ currentSession: session });
       },
 
       login: async (data: LoginRequest) => {
@@ -28,9 +31,30 @@ export const useAuthStore = create<AuthState>()(
         const { credential, password, rememberMe } = data;
 
         try {
-          const user = await authService.login({ credential, password });
+          const session = await authService.login({ credential, password });
 
-          set({ user, hasCheckedAuth: true });
+          const facilities = await getAllFacilitiesForSession();
+
+          const isAdmin = !!session?.roles.find(
+            (role) => role.name === "ADMIN_ROOT" || role.name === "SUPER_ADMIN",
+          );
+
+          session.facilities = facilities ? facilities : [];
+
+          if (isAdmin) {
+            session.facilities.unshift({
+              id: "ALL",
+              name: "Todas as unidades",
+            });
+          }
+
+          session.activeContext = {
+            facilityId: session.facilities[0]?.id || null,
+            facilityName: session.facilities[0]?.name || null,
+            isGlobal: session.activeContext?.isGlobal || false,
+          };
+
+          set({ currentSession: session, hasCheckedAuth: true });
 
           if (rememberMe) {
             const encryptedParams = CryptoJS.AES.encrypt(
@@ -64,8 +88,8 @@ export const useAuthStore = create<AuthState>()(
       checkAuth: async () => {
         if (get().hasCheckedAuth) return;
 
-        const persistedUser = get().user;
-        if (!persistedUser) {
+        const persistedSession = get().currentSession;
+        if (!persistedSession) {
           set({ hasCheckedAuth: true });
           return;
         }
@@ -73,28 +97,94 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoading: true });
 
         try {
-          const userFromServer = await authService.checkSession();
+          const sessionFromServer = await authService.checkSession();
 
           set({
-            user: {
-              fullName: persistedUser.fullName,
-              email: persistedUser.email,
-              id: userFromServer.id,
-              role: userFromServer.role,
-              permissions: userFromServer.permissions,
+            currentSession: {
+              ...sessionFromServer,
+              user: {
+                ...sessionFromServer.user,
+                fullName: sessionFromServer.user.fullName || persistedSession.user.fullName,
+              },
+              facilities: persistedSession.facilities ?? [],
+              activeContext: {
+                ...sessionFromServer.activeContext,
+                ...persistedSession.activeContext,
+              },
             },
           });
-        } catch {
-          set({ user: null, errorMessage: null });
+        } catch (error) {
+          const status =
+            (error as { response?: { status?: number } })?.response?.status ??
+            (error as { status?: number })?.status ??
+            null;
+
+          const isNetworkError = status === null;
+          const title = isNetworkError ? "Servidor indisponível" : "Sessão expirada";
+          const message = isNetworkError
+            ? "Não foi possível conectar ao servidor. Por favor, aguarde alguns instantes e tente novamente."
+            : "A sessão expirou. Por favor, faça login novamente.";
+
+          set({ currentSession: null, errorMessage: null });
           notifications.show({
-            title: "Sessão expirada",
-            message: "A sessão expirou. Por favor, faça login novamente.",
+            title,
+            message,
             color: "var(--status-warning)",
             position: "bottom-center",
             autoClose: 10000,
           });
         } finally {
           set({ hasCheckedAuth: true, isLoading: false });
+        }
+      },
+
+      revalidateSession: async () => {
+        if (get().isRevalidating) return;
+
+        const persistedSession = get().currentSession;
+        if (!persistedSession) return;
+
+        set({ isRevalidating: true });
+
+        try {
+          const sessionFromServer = await authService.checkSession();
+
+          set({
+            currentSession: {
+              ...sessionFromServer,
+              user: {
+                ...sessionFromServer.user,
+                fullName: sessionFromServer.user.fullName || persistedSession.user.fullName,
+              },
+              facilities: persistedSession.facilities ?? [],
+              activeContext: {
+                ...sessionFromServer.activeContext,
+                ...persistedSession.activeContext,
+              },
+            },
+          });
+        } catch (error) {
+          const status =
+            (error as { response?: { status?: number } })?.response?.status ??
+            (error as { status?: number })?.status ??
+            null;
+
+          const isNetworkError = status === null;
+          const title = isNetworkError ? "Servidor indisponível" : "Sessão encerrada";
+          const message = isNetworkError
+            ? "Não foi possível conectar ao servidor. Por favor, aguarde alguns instantes e tente novamente."
+            : "Sua sessão não é mais válida. Por favor, faça login novamente.";
+
+          set({ currentSession: null, hasCheckedAuth: true, errorMessage: null });
+          notifications.show({
+            title,
+            message,
+            color: "var(--status-warning)",
+            position: "bottom-center",
+            autoClose: 10000,
+          });
+        } finally {
+          set({ isRevalidating: false });
         }
       },
 
@@ -111,7 +201,7 @@ export const useAuthStore = create<AuthState>()(
             autoClose: 8000,
           });
         } finally {
-          set({ user: null, hasCheckedAuth: true, errorMessage: null });
+          set({ currentSession: null, hasCheckedAuth: true, errorMessage: null });
         }
       },
 
@@ -165,11 +255,27 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: false });
         }
       },
+
+      confirmActivation: async (data: ResetPasswordSecondStepRequest, token: string) => {
+        set({ isLoading: true, errorMessage: null });
+
+        try {
+          await authService.confirmActivation(data, token);
+          return true;
+        } catch (error) {
+          const message =
+            error instanceof Error ? error.message : "Erro inesperado ao ativar conta.";
+          set({ errorMessage: message });
+          return false;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
     }),
     {
       name: "auth-storage",
       partialize: (state) => ({
-        user: state.user,
+        currentSession: state.currentSession,
       }),
     },
   ),

@@ -1,0 +1,73 @@
+export type PermissionScopeMode = "GLOBAL" | "FACILITY" | "OWN";
+
+export type UserRoleScopeMode = "GLOBAL" | "FACILITY_SET";
+
+export const permissionKeys = [
+  "users.view",
+  "users.create",
+  "users.update",
+  "users.delete",
+  "roles.view",
+  "roles.manage",
+  "permissions.view",
+  "permissions.manage",
+  "facilities.view",
+  "facilities.manage",
+  "locations.view",
+  "locations.manage",
+  "items.view",
+  "items.create",
+  "items.update",
+  "items.delete",
+  "items.adjust",
+  "batches.view",
+  "batches.create",
+  "batches.update",
+  "inventory.view",
+  "inventory.adjust",
+  "inventory.transfer",
+  "requests.view",
+  "requests.create",
+  "requests.approve",
+  "requests.reject",
+  "requests.fulfill",
+  "controlled.authorize",
+  "reports.view",
+] as const;
+
+export type PermissionKey = (typeof permissionKeys)[number];
+
+export type AppPermissionKey = PermissionKey;
+
+export const permissionDisplayNames: Record<PermissionKey, string> = {
+  "users.view": "Visualizar Usuários",
+  "users.create": "Criar Usuários",
+  "users.update": "Editar Usuários",
+  "users.delete": "Excluir Usuários",
+  "roles.view": "Visualizar Cargos",
+  "roles.manage": "Gerenciar Cargos",
+  "permissions.view": "Visualizar Permissões",
+  "permissions.manage": "Gerenciar Permissões",
+  "facilities.view": "Visualizar Unidades",
+  "facilities.manage": "Gerenciar Unidades",
+  "locations.view": "Visualizar Locais",
+  "locations.manage": "Gerenciar Locais",
+  "items.view": "Visualizar Itens",
+  "items.create": "Criar Itens",
+  "items.update": "Editar Itens",
+  "items.delete": "Excluir Itens",
+  "items.adjust": "Ajustar Itens",
+  "batches.view": "Visualizar Lotes",
+  "batches.create": "Criar Lotes",
+  "batches.update": "Editar Lotes",
+  "inventory.view": "Visualizar Estoque",
+  "inventory.adjust": "Ajustar Estoque",
+  "inventory.transfer": "Transferir Estoque",
+  "requests.view": "Visualizar Solicitações",
+  "requests.create": "Criar Solicitações",
+  "requests.approve": "Aprovar Solicitações",
+  "requests.reject": "Rejeitar Solicitações",
+  "requests.fulfill": "Atender Solicitações",
+  "controlled.authorize": "Autorizar Controlados",
+  "reports.view": "Visualizar Relatórios",
+};

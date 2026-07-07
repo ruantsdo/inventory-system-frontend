@@ -2,7 +2,7 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { Box, Stack, Text, Title } from "@mantine/core";
 import { ThemeToggle } from "../../components";
 
-const LoaderPage = () => {
+export function LoaderPage() {
   return (
     <Box className="bg-background h-screen w-screen relative flex flex-col items-center justify-center">
       <Box pos="absolute" top={20} right={20}>
@@ -21,10 +21,13 @@ const LoaderPage = () => {
         </Stack>
       </Box>
       <Box className="w-[600px]">
-        <DotLottieReact src="src/assets/animations/pageLoader.lottie" speed={0.4} loop autoplay />
+        <DotLottieReact
+          src="src/public/assets/animations/pageLoader.lottie"
+          speed={0.4}
+          loop
+          autoplay
+        />
       </Box>
     </Box>
   );
-};
-
-export default LoaderPage;
+}

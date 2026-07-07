@@ -3,10 +3,7 @@ import { Box, Paper, Text } from "@mantine/core";
 
 import { ChartTooltip } from "./ChartTooltip";
 
-interface ConsumptionData {
-  day: string;
-  value: number;
-}
+import type { ConsumptionData } from "../types/dashboard";
 
 const consumptionData: ConsumptionData[] = [
   { day: "Seg", value: 820 },

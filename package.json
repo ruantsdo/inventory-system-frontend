@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@hookform/resolvers": "^5.2.2",
+    "@hookform/resolvers": "^5.4.0",
     "@lottiefiles/dotlottie-react": "^0.17.15",
     "@mantine/carousel": "^8.3.14",
     "@mantine/charts": "^8.3.14",
@@ -27,6 +27,7 @@
     "dayjs": "^1.11.19",
     "embla-carousel": "^8.6.0",
     "embla-carousel-react": "^8.6.0",
+    "js-cookie": "^3.0.8",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.71.1",
@@ -42,6 +43,7 @@
     "@biomejs/biome": "^2.3.15",
     "@eslint/js": "^9.39.1",
     "@types/crypto-js": "^4.2.2",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",

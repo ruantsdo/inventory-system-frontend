@@ -4,7 +4,7 @@ import { notifications } from "@mantine/notifications";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { FaLock } from "react-icons/fa";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { ThemeToggle } from "../../components";
 import {
   type ResetPasswordSecondStepRequest,
@@ -12,11 +12,15 @@ import {
 } from "../../schemas/auth";
 import { useAuthStore } from "../../stores/auth";
 
-const ResetPasswordSecondStepPage = () => {
+export function ResetPasswordSecondStepPage() {
   const navigate = useNavigate();
-  const { resetPasswordSecondStep, isLoading } = useAuthStore();
-  const { token } = useParams();
+  const { resetPasswordSecondStep, confirmActivation, isLoading } = useAuthStore();
+  const { token: pathToken } = useParams();
+  const [searchParams] = useSearchParams();
+  const token = pathToken || searchParams.get("token") || undefined;
   const [lockSubmit, setLockSubmit] = useState(false);
+
+  const isActivation = window.location.pathname.includes("/activate");
 
   const {
     register,
@@ -34,23 +38,37 @@ const ResetPasswordSecondStepPage = () => {
     if (!token) {
       notifications.show({
         title: "Link inválido",
-        message: "Para redefinir sua senha, use o link de redefinição enviado para o seu e-mail.",
-        color: "var(--status-error)",
+        message: isActivation
+          ? "Para ativar sua conta, use o link de ativação enviado para o seu e-mail."
+          : "Para redefinir sua senha, use o link de redefinição enviado para o seu e-mail.",
+        color: "var(--status-warning)",
         position: "bottom-center",
-        autoClose: false,
+        autoClose: 10000,
+        withCloseButton: true,
+      });
+
+      notifications.show({
+        message: isActivation
+          ? "Se o problema persistir, entre em contato com o suporte."
+          : "Se o problema persistir, você pode redefinir sua senha através da tela de login.",
+        color: "var(--status-info)",
+        position: "bottom-center",
+        autoClose: 10000,
         withCloseButton: true,
       });
 
       return;
     }
 
-    const success = await resetPasswordSecondStep(data, token);
+    const success = isActivation
+      ? await confirmActivation(data, token)
+      : await resetPasswordSecondStep(data, token);
 
     if (success) {
       setLockSubmit(true);
 
-      const resetPasswordNotificationId = notifications.show({
-        title: "Senha redefinida!",
+      const notificationId = notifications.show({
+        title: isActivation ? "Conta ativada!" : "Senha redefinida!",
         message: "Vamos redirecioná-lo para a página de login.",
         color: "var(--status-success)",
         position: "bottom-center",
@@ -61,9 +79,11 @@ const ResetPasswordSecondStepPage = () => {
         navigate("/login");
 
         notifications.update({
-          id: resetPasswordNotificationId,
-          title: "Senha atualizada!",
-          message: "Agora você pode fazer login com sua nova senha!",
+          id: notificationId,
+          title: isActivation ? "Conta pronta!" : "Senha atualizada!",
+          message: isActivation
+            ? "Agora você já pode fazer login na sua conta!"
+            : "Agora você pode fazer login com sua nova senha!",
           color: "var(--status-success)",
           position: "bottom-center",
           autoClose: 10000,
@@ -89,10 +109,10 @@ const ResetPasswordSecondStepPage = () => {
             <Stack align="center" mb="lg">
               <Box maw={300}>
                 <Title order={3} fw={800} ta="center" className="text-text-main">
-                  Redefinir senha
+                  {isActivation ? "Ativar conta" : "Redefinir senha"}
                 </Title>
                 <Text size="xs" ta="center" fw={500} mt={4} className="text-primary">
-                  Informe sua nova senha
+                  {isActivation ? "Escolha sua senha de acesso" : "Informe sua nova senha"}
                 </Text>
               </Box>
             </Stack>
@@ -141,7 +161,15 @@ const ResetPasswordSecondStepPage = () => {
                   loading={isLoading}
                   disabled={lockSubmit}
                 >
-                  {isLoading ? "Aguarde..." : lockSubmit ? "Senha redefinida!" : "Redefinir senha"}
+                  {isLoading
+                    ? "Aguarde..."
+                    : lockSubmit
+                      ? isActivation
+                        ? "Conta ativada!"
+                        : "Senha redefinida!"
+                      : isActivation
+                        ? "Ativar conta"
+                        : "Redefinir senha"}
                 </Button>
               </Stack>
             </form>
@@ -150,6 +178,4 @@ const ResetPasswordSecondStepPage = () => {
       </Container>
     </Box>
   );
-};
-
-export default ResetPasswordSecondStepPage;
+}

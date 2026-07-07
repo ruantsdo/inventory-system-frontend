@@ -1,13 +1,6 @@
 import { Box, Paper, Text, ThemeIcon } from "@mantine/core";
-import type { ReactNode } from "react";
 
-interface StatCardProps {
-  icon: ReactNode;
-  label: string;
-  value: number | string;
-  description?: string;
-  color: "error" | "warning" | "success";
-}
+import type { StatCardProps } from "../types/components";
 
 const colorMap = {
   error: {

@@ -3,7 +3,7 @@ import { Box, Button, Stack, Text, Title } from "@mantine/core";
 import { useNavigate } from "react-router";
 import { ThemeToggle } from "../../components";
 
-const PageNotFound = () => {
+export function NotFoundPage() {
   const navigate = useNavigate();
 
   const handleGoBack = () => {
@@ -27,7 +27,7 @@ const PageNotFound = () => {
         </Stack>
       </Box>
       <Box className="w-[600px]">
-        <DotLottieReact src="src/assets/animations/404.lottie" speed={0.4} loop autoplay />
+        <DotLottieReact src="src/public/assets/animations/404.lottie" speed={0.4} loop autoplay />
       </Box>
       <Button
         mt="lg"
@@ -40,6 +40,4 @@ const PageNotFound = () => {
       </Button>
     </Box>
   );
-};
-
-export default PageNotFound;
+}

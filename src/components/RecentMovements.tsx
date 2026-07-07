@@ -1,15 +1,7 @@
 import { Badge, Box, Button, Paper, Table, Text } from "@mantine/core";
 import { useNavigate } from "react-router";
 
-interface Movement {
-  id: number;
-  item: string;
-  lot: string;
-  type: "Entrada" | "Saída";
-  quantity: number;
-  responsible: string;
-  date: string;
-}
+import type { Movement } from "../types/dashboard";
 
 const movements: Movement[] = [
   {

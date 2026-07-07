@@ -3,20 +3,26 @@ import type {
   ResetPasswordFirstStepRequest,
   ResetPasswordSecondStepRequest,
 } from "../../schemas/auth";
-import type { AuthUser } from "./";
+import type { AuthSession } from "../../types/permissions";
 
 export interface AuthState {
-  user: AuthUser | null;
+  currentSession: AuthSession | null;
   isLoading: boolean;
   hasCheckedAuth: boolean;
+  isRevalidating: boolean;
   errorMessage: string | null;
 
   login: (data: LoginRequest) => Promise<void>;
   logout: () => Promise<void>;
-  setUser: (user: AuthUser | null) => void;
+  setCurrentSession: (session: AuthSession | null) => void;
   checkAuth: () => Promise<void>;
+  revalidateSession: () => Promise<void>;
   resetPasswordFirstStep: (data: ResetPasswordFirstStepRequest) => Promise<boolean>;
   resetPasswordSecondStep: (
+    data: ResetPasswordSecondStepRequest,
+    token: string,
+  ) => Promise<boolean>;
+  confirmActivation: (
     data: ResetPasswordSecondStepRequest,
     token: string,
   ) => Promise<boolean>;

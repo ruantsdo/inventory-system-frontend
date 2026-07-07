@@ -1,9 +1,10 @@
-import type { AuthUser } from "../../types/user";
 import {
+  selectCurrentSession,
   selectErrorMessage,
   selectHasCheckedAuth,
   selectIsAuthenticated,
   selectIsLoading,
+  selectRoles,
   selectUser,
 } from "./auth.selectors";
 import { useAuthStore } from "./auth.store";
@@ -14,7 +15,10 @@ export {
   selectIsAuthenticated,
   selectHasCheckedAuth,
   selectIsLoading,
+  selectCurrentSession,
   selectUser,
+  selectRoles,
   selectErrorMessage,
 };
-export type { AuthState, AuthUser };
+export type { AuthState };
+

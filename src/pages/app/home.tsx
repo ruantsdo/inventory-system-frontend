@@ -7,9 +7,10 @@ import { StatCard } from "../../components/StatCard";
 import { useAuthStore } from "../../stores/auth";
 import { useTimingStore } from "../../stores/utils";
 
-const HomePage = () => {
-  const { user } = useAuthStore();
+export function HomePage() {
+  const { currentSession } = useAuthStore();
   const { greeting, formattedDate } = useTimingStore();
+  const user = currentSession?.user;
 
   return (
     <Box className="max-w-7xl mx-auto space-y-6">
@@ -70,6 +71,4 @@ const HomePage = () => {
       <RecentMovements />
     </Box>
   );
-};
-
-export default HomePage;
+}

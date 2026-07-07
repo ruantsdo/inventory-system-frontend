@@ -1,15 +1,7 @@
 import { getFilteredChartTooltipPayload } from "@mantine/charts";
 import { Paper, Text } from "@mantine/core";
 
-interface ChartTooltipProps {
-  label: React.ReactNode;
-  payload: Record<string, ConsumptionData>[] | undefined;
-}
-
-interface ConsumptionData {
-  day: string;
-  value: number;
-}
+import type { ChartTooltipProps } from "../types/dashboard";
 
 export function ChartTooltip({ label, payload }: ChartTooltipProps) {
   if (!payload) return null;
