@@ -10,13 +10,7 @@ import {
   Tooltip,
   UnstyledButton,
 } from "@mantine/core";
-import {
-  FaBell,
-  FaMoon,
-  FaSignOutAlt,
-  FaSun,
-  FaUser,
-} from "react-icons/fa";
+import { FaBell, FaMoon, FaSignOutAlt, FaSun, FaUser } from "react-icons/fa";
 import { useFacilityContext } from "../../hooks/useFacilityContext";
 import { useThemeToggle } from "../../hooks/useThemeToggle";
 import { useAuthStore } from "../../stores/auth";
@@ -93,11 +87,7 @@ export function SidebarFooter({ isCollapsed, user, onProfileOpen }: SidebarFoote
 
             <Menu.Divider />
             <Menu.Label>Conta</Menu.Label>
-            <Menu.Item
-              onClick={onProfileOpen}
-              leftSection={<FaUser size={16} />}
-              color="blue"
-            >
+            <Menu.Item onClick={onProfileOpen} leftSection={<FaUser size={16} />} color="blue">
               Meu Perfil
             </Menu.Item>
             <Menu.Item onClick={logout} leftSection={<FaSignOutAlt size={16} />} color="red">

@@ -34,7 +34,19 @@ export const useAuthStore = create<AuthState>()(
           const session = await authService.login({ credential, password });
 
           const facilities = await getAllFacilitiesForSession();
+
+          const isAdmin = !!session?.roles.find(
+            (role) => role.name === "ADMIN_ROOT" || role.name === "SUPER_ADMIN",
+          );
+
           session.facilities = facilities ? facilities : [];
+
+          if (isAdmin) {
+            session.facilities.unshift({
+              id: "ALL",
+              name: "Todas as unidades",
+            });
+          }
 
           session.activeContext = {
             facilityId: session.facilities[0]?.id || null,

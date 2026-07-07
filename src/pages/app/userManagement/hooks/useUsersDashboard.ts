@@ -22,10 +22,10 @@ export function useUsersDashboard() {
     try {
       let result: UserListItem[] = [];
 
-      if (currentSession?.activeContext.facilityId) {
-        result = await getUsersByFacilityId(currentSession.activeContext.facilityId);
-      } else if (currentSession?.activeContext.isGlobal) {
+      if (currentSession?.activeContext.facilityId === "ALL") {
         result = await getAllUsers();
+      } else if (currentSession?.activeContext.facilityId) {
+        result = await getUsersByFacilityId(currentSession.activeContext.facilityId);
       }
 
       setAllUsers(result);
