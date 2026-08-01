@@ -1,3 +1,4 @@
+export { AuditsPage } from "./audits";
 export { HomePage } from "./home";
 export { CreateUserPage } from "./userManagement/createUserPage";
 export { EditUserPage } from "./userManagement/editUserPage";

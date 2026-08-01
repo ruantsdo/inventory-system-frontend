@@ -1,6 +1,7 @@
 import {
   FaBoxes,
   FaChartBar,
+  FaClipboardList,
   FaExchangeAlt,
   FaFileAlt,
   FaLayerGroup,
@@ -44,6 +45,12 @@ export const NAV_ITEMS: NavItem[] = [
     icon: <FaUsers size={16} />,
     path: "/users/dashboard",
     permission: "users.view",
+  },
+  {
+    label: "Auditoria",
+    icon: <FaClipboardList size={16} />,
+    path: "/audits",
+    permission: "audit.view",
   },
 ];
 
