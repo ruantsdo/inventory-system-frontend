@@ -2,6 +2,8 @@ import { notifications } from "@mantine/notifications";
 import CryptoJS from "crypto-js";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { AppPermissionKey } from "../../enums";
+import { appRoutesPermissions } from "../../routes/app.routes.permissions";
 import type {
   LoginRequest,
   ResetPasswordFirstStepRequest,
@@ -10,16 +12,17 @@ import type {
 import { authService } from "../../services/auth";
 import { getAllFacilitiesForSession } from "../../services/facilities";
 import type { AuthSession } from "../../types/permissions";
+import { useUtilsStore } from "../../utils";
 import type { AuthState } from "./";
 
 export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
-      currentSession: null,
+      currentSession: null as AuthSession | null,
       isLoading: false,
       hasCheckedAuth: false,
       isRevalidating: false,
-      errorMessage: null,
+      errorMessage: null as string | null,
 
       setCurrentSession: (session: AuthSession | null) => {
         set({ currentSession: session });
@@ -271,7 +274,27 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: false });
         }
       },
+
+      canNavigateTo: (path: string): boolean => {
+        const normalize = (p: string) => (p.startsWith("/") ? p : `/${p}`);
+        const absolutePath = normalize(path);
+
+        const routePermission = appRoutesPermissions.find((r) => {
+          const routePath = normalize(r.path);
+          const regexPattern = `^${routePath.replace(/:[^\s/]+/g, "[^/]+")}$`;
+          return new RegExp(regexPattern).test(absolutePath);
+        });
+
+        if (!routePermission || !routePermission.permission) {
+          return true;
+        }
+
+        return useUtilsStore
+          .getState()
+          .checkPermission(routePermission.permission as AppPermissionKey);
+      },
     }),
+
     {
       name: "auth-storage",
       partialize: (state) => ({

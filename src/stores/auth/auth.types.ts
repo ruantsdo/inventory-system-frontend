@@ -22,8 +22,6 @@ export interface AuthState {
     data: ResetPasswordSecondStepRequest,
     token: string,
   ) => Promise<boolean>;
-  confirmActivation: (
-    data: ResetPasswordSecondStepRequest,
-    token: string,
-  ) => Promise<boolean>;
+  confirmActivation: (data: ResetPasswordSecondStepRequest, token: string) => Promise<boolean>;
+  canNavigateTo: (path: string) => boolean;
 }
