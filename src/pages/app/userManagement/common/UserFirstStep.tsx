@@ -23,9 +23,9 @@ import { Controller, useFormContext } from "react-hook-form";
 import { FaAddressCard, FaFileAlt, FaTrash, FaUser } from "react-icons/fa";
 import { withMask } from "use-mask-input";
 import { brazilianStates, professionalDocumentTypes } from "../../../../enums";
-import { useUtilsStore } from "../../../../stores/utils/utils.store";
 import type { ProfessionalDocumentType } from "../../../../types/api.contracts";
 import type { CreateUserFormState } from "../../../../types/createUser";
+import { useUtilsStore } from "../../../../utils";
 
 interface UserFirstStepProps {
   mode?: "create" | "edit";

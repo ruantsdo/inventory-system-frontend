@@ -1,7 +1,7 @@
 import { Box, Button, Text, Title } from "@mantine/core";
 import { FaPlus, FaUsers } from "react-icons/fa";
 import { useAuthStore } from "../../../../../stores/auth";
-import { useUtilsStore } from "../../../../../stores/utils";
+import { useUtilsStore } from "../../../../../utils";
 
 export function UsersDashboardHeader() {
   const { currentSession } = useAuthStore();

@@ -5,7 +5,7 @@ import { ConsumptionChart } from "../../components/ConsumptionChart";
 import { RecentMovements } from "../../components/RecentMovements";
 import { StatCard } from "../../components/StatCard";
 import { useAuthStore } from "../../stores/auth";
-import { useTimingStore } from "../../stores/utils";
+import { useTimingStore } from "../../utils";
 
 export function HomePage() {
   const { currentSession } = useAuthStore();

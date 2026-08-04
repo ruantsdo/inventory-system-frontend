@@ -141,18 +141,28 @@ export function LoginPage() {
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         if (isAutofilled) {
                           setIsAutofilled(false);
-                          const firstTwo = savedData?.credential?.substring(0, 2) || "";
-                          const typedChar = (e.nativeEvent as InputEvent)?.data?.replace(/\D/g, "") || "";
-                          field.onChange(firstTwo + typedChar);
+                          const data = (e.nativeEvent as InputEvent)?.data;
+                          if (data) {
+                            field.onChange(data.replace(/\D/g, ""));
+                          } else {
+                            field.onChange("");
+                          }
                         } else {
                           field.onChange(e);
                         }
                       }}
                       onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                        if (isAutofilled && (e.key === "Backspace" || e.key === "Delete")) {
-                          setIsAutofilled(false);
-                          field.onChange(savedData?.credential?.substring(0, 2) || "");
-                          e.preventDefault();
+                        if (isAutofilled) {
+                          if (e.key === "Backspace" || e.key === "Delete") {
+                            setIsAutofilled(false);
+                            field.onChange("");
+                            e.preventDefault();
+                          } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+                            setIsAutofilled(false);
+                            const digit = /^\d$/.test(e.key) ? e.key : "";
+                            field.onChange(digit);
+                            e.preventDefault();
+                          }
                         }
                       }}
                       ref={(element: HTMLInputElement | null) => {

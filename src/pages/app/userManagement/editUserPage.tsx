@@ -29,9 +29,8 @@ import type { z } from "zod";
 import { createUserStep1Schema } from "../../../schemas/userManagement/createUserFirstStep";
 import { createUserStep2Schema } from "../../../schemas/userManagement/createUserSecondStep";
 import { useUserManagementStore } from "../../../stores/app/userManagement";
-import { useReferenceDataStore } from "../../../stores/utils";
 import { type CreateUserFormState, EMPTY_FORM_STATE } from "../../../types/createUser";
-import { buildUserPayload, formatBrDateToIso } from "../../../utils";
+import { buildUserPayload, formatBrDateToIso, useReferenceDataStore } from "../../../utils";
 import { UserFirstStep } from "./common/UserFirstStep";
 import { UserSecondStep } from "./common/UserSecondStep";
 import { UserThirdStep } from "./common/UserThirdStep";
@@ -71,16 +70,17 @@ export function EditUserPage() {
 
     getUserDataForEdit(userId)
       .then((data) => {
-        const professionalDocuments = data.professionalDocuments?.map((doc) => ({
-          id: `${crypto.randomUUID()}-edit`,
-          documentType: doc.documentType,
-          documentNumber: doc.documentNumber,
-          issuer: doc.issuer || "",
-          issuerState: doc.issuerState || "",
-          issuedAt: doc.issuedAt ? doc.issuedAt.substring(0, 10) : "",
-          expiresAt: doc.expiresAt ? doc.expiresAt.substring(0, 10) : "",
-          notes: doc.notes || "",
-        })) || [];
+        const professionalDocuments =
+          data.professionalDocuments?.map((doc) => ({
+            id: `${crypto.randomUUID()}-edit`,
+            documentType: doc.documentType,
+            documentNumber: doc.documentNumber,
+            issuer: doc.issuer || "",
+            issuerState: doc.issuerState || "",
+            issuedAt: doc.issuedAt ? doc.issuedAt.substring(0, 10) : "",
+            expiresAt: doc.expiresAt ? doc.expiresAt.substring(0, 10) : "",
+            notes: doc.notes || "",
+          })) || [];
         const hasProfessionalDocument = professionalDocuments.length > 0;
 
         const allocations = data.roles.flatMap((r) => {

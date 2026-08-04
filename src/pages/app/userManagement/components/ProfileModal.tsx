@@ -25,9 +25,8 @@ import {
 import { getSelfData } from "../../../../services/users";
 import { useUserManagementStore } from "../../../../stores/app/userManagement";
 import { useAuthStore } from "../../../../stores/auth";
-import { useUtilsStore } from "../../../../stores/utils";
 import type { UserData } from "../../../../types/user";
-import { formatToBrDate } from "../../../../utils/date.utils";
+import { formatToBrDate, useUtilsStore } from "../../../../utils";
 
 interface ProfileModalProps {
   opened: boolean;

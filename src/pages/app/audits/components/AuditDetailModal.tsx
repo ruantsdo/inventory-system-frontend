@@ -22,7 +22,7 @@ import {
   FaUser,
 } from "react-icons/fa";
 import type { DetailAuditOutput } from "../../../../types/api.contracts";
-import { formatToBrDate } from "../../../../utils/date.utils";
+import { formatToBrDate } from "../../../../utils";
 import { useAuditTranslation } from "../hooks/useAuditTranslation";
 import { AuditSeverityBadge } from "./AuditSeverityBadge";
 

@@ -13,8 +13,8 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { FaEdit, FaEye, FaPause, FaPlay, FaTrash } from "react-icons/fa";
-import { useUtilsStore } from "../../../../../stores/utils";
 import type { UserListItem } from "../../../../../types/usersDashboard";
+import { useUtilsStore } from "../../../../../utils";
 import { ProfileModal } from "../ProfileModal";
 import { UserActionConfirmModal } from "../UserActionConfirmModal";
 

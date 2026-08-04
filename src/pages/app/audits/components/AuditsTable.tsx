@@ -1,7 +1,7 @@
 import { ActionIcon, Box, Group, Paper, Skeleton, Table, Text, Tooltip } from "@mantine/core";
 import { FaEye } from "react-icons/fa";
 import type { AuditOutput } from "../../../../types/api.contracts";
-import { formatToBrDate } from "../../../../utils/date.utils";
+import { formatToBrDate } from "../../../../utils";
 import { useAuditTranslation } from "../hooks/useAuditTranslation";
 import { AuditSeverityBadge } from "./AuditSeverityBadge";
 
