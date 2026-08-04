@@ -2,8 +2,8 @@ import type {
   CreateUserPayload,
   ProfessionalDocumentType,
   UserProfessionalDocumentPayload,
-} from "../types/api.contracts";
-import type { CreateUserFormState } from "../types/createUser";
+} from "../../types/api.contracts";
+import type { CreateUserFormState } from "../../types/createUser";
 
 export function buildUserPayload(form: CreateUserFormState): CreateUserPayload {
   const profDocs: UserProfessionalDocumentPayload[] = form.hasProfessionalDocument

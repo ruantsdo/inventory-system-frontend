@@ -1,10 +1,10 @@
-import type { AppPermissionKey } from "../enums/permissions";
+import type { AppPermissionKey } from "../../enums/permissions";
 import type {
   ActiveContext,
   AuthSession,
   PermissionCheckInput,
   PermissionCheckResult,
-} from "../types/permissions";
+} from "../../types/permissions";
 
 export function hasPermission(session: AuthSession | null, permission: AppPermissionKey): boolean {
   if (!session) return false;

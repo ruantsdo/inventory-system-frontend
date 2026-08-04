@@ -1,17 +1,13 @@
-import { create } from "zustand";
+import type { SliceCreator, TimingSlice } from "../../types/utils.types";
 
-interface TimingStore {
-  greeting: () => string;
-  formattedDate: () => string;
-}
-
-export const useTimingStore = create<TimingStore>()(() => ({
+export const createTimingSlice: SliceCreator<TimingSlice> = () => ({
   greeting: () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Bom dia";
     if (hour < 18) return "Boa tarde";
     return "Boa noite";
   },
+
   formattedDate: () => {
     return new Date().toLocaleDateString("pt-BR", {
       weekday: "long",
@@ -20,4 +16,4 @@ export const useTimingStore = create<TimingStore>()(() => ({
       year: "numeric",
     });
   },
-}));
+});

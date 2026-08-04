@@ -1,16 +1,14 @@
-import { create } from "zustand";
-import { getActiveFacilitiesByCity } from "../../services/facilities";
-import { getCities } from "../../services/geo";
-import { getMyPermissions, getRoles } from "../../services/permissions";
-import type { ReferenceDataState } from "./referenceData.types";
+import { getActiveFacilitiesByCity } from "../../../services/facilities";
+import { getCities } from "../../../services/geo";
+import { getMyPermissions, getRoles } from "../../../services/permissions";
+import type { ReferenceDataSlice, SliceCreator } from "../../types/utils.types";
 
-export const useReferenceDataStore = create<ReferenceDataState>((set, get) => ({
+export const createReferenceDataSlice: SliceCreator<ReferenceDataSlice> = (set, get) => ({
   myPermissions: [],
   functionalRoles: [],
   administrativeRoles: [],
   allRoles: [],
   cities: [],
-
   referenceDataLoading: false,
   referenceDataError: null,
   referenceDataLoaded: false,
@@ -55,7 +53,7 @@ export const useReferenceDataStore = create<ReferenceDataState>((set, get) => ({
     }
   },
 
-  reset: () => {
+  resetReferenceData: () => {
     set({
       myPermissions: [],
       functionalRoles: [],
@@ -67,4 +65,4 @@ export const useReferenceDataStore = create<ReferenceDataState>((set, get) => ({
       referenceDataLoaded: false,
     });
   },
-}));
+});
