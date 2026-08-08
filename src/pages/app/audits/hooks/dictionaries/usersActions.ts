@@ -42,6 +42,12 @@ export const usersAuditActions = {
   BULK_DATA_IMPORTED: "Dados em lote importados",
   BULK_DATA_EXPORTED: "Dados em lote exportados",
 
+  GOVERNANCE_ACCESS_DENIED: "Acesso negado pela governança",
+  ROOT_SHIELDING_TRIGGERED: "Usuário ROOT protegido",
+  FACILITY_SCOPE_VIOLATION: "Violação de escopo de unidade",
+  INSUFFICIENT_GOVERNANCE_LEVEL: "Nível de governança insuficiente",
+  PROTECTED_ROLE_VIOLATION: "Violação de cargo protegido",
+
   USER_SENSITIVE_DATA_VIEWED: "Dados sensíveis do usuário visualizados",
   PROFESSIONAL_DOC_EXPOSED: "Documento profissional exposto",
   FINANCIAL_COST_EXPOSED: "Custo financeiro exposto",
