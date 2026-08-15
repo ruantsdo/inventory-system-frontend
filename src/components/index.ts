@@ -1,3 +1,9 @@
+export {
+  ActionConfirmModal,
+  type ActionConfirmItemDetails,
+  type ActionConfirmModalProps,
+  type ActionConfirmType,
+} from "./ActionConfirmModal";
 export { AlertFeed } from "./AlertFeed";
 export { ChartTooltip } from "./ChartTooltip";
 export { ConsumptionChart } from "./ConsumptionChart";
@@ -6,3 +12,4 @@ export { RecentMovements } from "./RecentMovements";
 export { Sidebar } from "./Sidebar/index";
 export { StatCard } from "./StatCard";
 export { ThemeToggle } from "./ThemeToggle";
+

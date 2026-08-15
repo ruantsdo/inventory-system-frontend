@@ -4,6 +4,7 @@ import {
   FaClipboardList,
   FaExchangeAlt,
   FaFileAlt,
+  FaIndustry,
   FaLayerGroup,
   FaTachometerAlt,
   FaUsers,
@@ -41,6 +42,12 @@ export const NAV_ITEMS: NavItem[] = [
     permission: "requests.view",
   },
   {
+    label: "Fabricantes",
+    icon: <FaIndustry size={16} />,
+    path: "/manufacturers",
+    permission: "items.view",
+  },
+  {
     label: "Usuários",
     icon: <FaUsers size={16} />,
     path: "/users/dashboard",
@@ -56,3 +63,4 @@ export const NAV_ITEMS: NavItem[] = [
 
 export const APP_LOGO_ICON = <FaChartBar size={16} className="text-white" />;
 export const APP_NAME = "Gestão de Estoque";
+
