@@ -51,6 +51,26 @@ export const usersAuditActions = {
   USER_SENSITIVE_DATA_VIEWED: "Dados sensíveis do usuário visualizados",
   PROFESSIONAL_DOC_EXPOSED: "Documento profissional exposto",
   FINANCIAL_COST_EXPOSED: "Custo financeiro exposto",
+
+  MANUFACTURER_CREATED: "Fabricante criado",
+  MANUFACTURER_UPDATED: "Fabricante atualizado",
+  MANUFACTURER_DELETED: "Fabricante excluído",
+
+  SUPPLIER_CREATED: "Fornecedor criado",
+  SUPPLIER_UPDATED: "Fornecedor atualizado",
+  SUPPLIER_DELETED: "Fornecedor excluído",
+
+  ITEM_TYPE_CREATED: "Tipo de item criado",
+  ITEM_TYPE_UPDATED: "Tipo de item atualizado",
+  ITEM_TYPE_DELETED: "Tipo de item excluído",
+
+  ITEM_CREATED: "Item criado",
+  ITEM_UPDATED: "Item atualizado",
+  ITEM_DELETED: "Item excluído",
+
+  BATCH_CREATED: "Lote criado",
+  BATCH_UPDATED: "Lote atualizado",
+  BATCH_DELETED: "Lote excluído",
 } as const;
 
 export type AuditActionType = (typeof usersAuditActions)[keyof typeof usersAuditActions];

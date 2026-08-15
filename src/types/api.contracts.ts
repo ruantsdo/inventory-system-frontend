@@ -195,3 +195,71 @@ export interface DetailAuditOutput extends AuditOutput {
   before: Record<string, unknown>;
   after: Record<string, unknown>;
 }
+
+// MANUFACTURERS
+
+export interface ManufacturerContactPayload {
+  email?: string | undefined;
+  phone?: string | undefined;
+  contactPerson?: string | undefined;
+}
+
+export interface CreateManufacturerPayload {
+  name: string;
+  cnpj?: string | undefined;
+  contact?: ManufacturerContactPayload | undefined;
+  cityId?: string | undefined;
+}
+
+export interface UpdateManufacturerPayload {
+  name?: string | undefined;
+  cnpj?: string | undefined;
+  contact?: ManufacturerContactPayload | undefined;
+  cityId?: string | undefined;
+}
+
+export interface ManufacturerOutput {
+  id: ID;
+  name: string;
+  cnpj: string | null;
+  contact: ManufacturerContactPayload | null;
+  cityId: string | null;
+  city?: { id: ID; name: string; state: string | null } | null;
+  createdByUserId?: string | null;
+  updatedByUserId?: string | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  _count?: { items: number; batches: number };
+}
+
+export interface PaginatedManufacturersOutput {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  data: ManufacturerOutput[];
+}
+
+export interface ManufacturerItemOutput {
+  id: ID;
+  identifier: string;
+  gtin: string | null;
+  name: string;
+  description: string | null;
+  unitOfMeasurement: string;
+  unitSize?: number | string | null | undefined;
+  isActive: boolean;
+  itemTypeId: string | null;
+  itemType?: { id: ID; slug: string; title: string } | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}
+
+export interface PaginatedManufacturerItemsOutput {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  data: ManufacturerItemOutput[];
+}
+
