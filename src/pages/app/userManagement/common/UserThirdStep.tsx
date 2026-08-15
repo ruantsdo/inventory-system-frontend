@@ -20,7 +20,7 @@ import type {
 import type { CreateUserFormState } from "../../../../types/createUser";
 
 interface UserThirdStepProps {
-  payload: CreateUserPayload | UpdateUserPayload;
+  payload?: CreateUserPayload | UpdateUserPayload;
   allRoles: RoleWithPermissionsOutput[];
   mode?: "create" | "edit";
 }
@@ -64,7 +64,7 @@ function InfoRow({ label, value }: { label: string; value?: string | null }) {
   );
 }
 
-export function UserThirdStep({ payload, allRoles, mode }: UserThirdStepProps) {
+export function UserThirdStep({ allRoles, mode }: UserThirdStepProps) {
   const { getValues } = useFormContext<CreateUserFormState>();
   const data = getValues();
   const fullName = data.fullName;

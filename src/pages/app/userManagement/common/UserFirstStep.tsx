@@ -18,14 +18,17 @@ import { DateInput } from "@mantine/dates";
 import "@mantine/dates/styles.css";
 import "dayjs/locale/pt-br";
 import dayjs from "dayjs";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { FaAddressCard, FaFileAlt, FaTrash, FaUser } from "react-icons/fa";
 import { withMask } from "use-mask-input";
 import { brazilianStates, professionalDocumentTypes } from "../../../../enums";
+import { getCitiesByState } from "../../../../services/geo";
+import { useReferenceDataStore } from "../../../../stores/utils";
 import { useUtilsStore } from "../../../../stores/utils/utils.store";
 import type { ProfessionalDocumentType } from "../../../../types/api.contracts";
 import type { CreateUserFormState } from "../../../../types/createUser";
+import { resolveStateUf } from "../../../../utils";
 
 interface UserFirstStepProps {
   mode?: "create" | "edit";
@@ -40,8 +43,53 @@ export function UserFirstStep({ mode }: UserFirstStepProps) {
     formState: { errors },
   } = useFormContext<CreateUserFormState>();
   const { cepIsLoading, cepError, fetchCep } = useUtilsStore();
+  const { cities, loadReferenceData } = useReferenceDataStore();
+
+  const [stateCities, setStateCities] = useState<{ value: string; label: string }[]>([]);
+  const [citiesLoading, setCitiesLoading] = useState(false);
 
   const cepRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    loadReferenceData();
+  }, [loadReferenceData]);
+
+  const selectedState = watch("addressState");
+
+  useEffect(() => {
+    if (!selectedState && cities.length > 0) {
+      const activeCity = cities.find((c) => c.state) || cities[0];
+      const initialUf = resolveStateUf(activeCity?.state);
+      if (initialUf) {
+        setValue("addressState", initialUf, { shouldValidate: true });
+      }
+    }
+  }, [cities, selectedState, setValue]);
+
+  useEffect(() => {
+    if (!selectedState) return;
+
+    let isMounted = true;
+    setCitiesLoading(true);
+
+    getCitiesByState(selectedState)
+      .then((data) => {
+        if (!isMounted) return;
+        const options = data.map((c) => ({ value: c.name, label: c.name }));
+        setStateCities(options);
+      })
+      .catch(() => {
+        if (!isMounted) return;
+        setStateCities([]);
+      })
+      .finally(() => {
+        if (isMounted) setCitiesLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedState]);
 
   const handleCepChange = (value: string) => {
     if (cepRef.current) clearTimeout(cepRef.current);
@@ -53,8 +101,12 @@ export function UserFirstStep({ mode }: UserFirstStepProps) {
         if (result) {
           setValue("streetAddress", result.logradouro ?? "", { shouldValidate: true });
           setValue("neighborhood", result.bairro ?? "", { shouldValidate: true });
-          setValue("addressCity", result.localidade ?? "", { shouldValidate: true });
-          setValue("addressState", result.uf ?? "", { shouldValidate: true });
+          if (result.uf) {
+            setValue("addressState", result.uf, { shouldValidate: true });
+          }
+          if (result.localidade) {
+            setValue("addressCity", result.localidade, { shouldValidate: true });
+          }
         }
       }, 600);
     }
@@ -324,7 +376,7 @@ export function UserFirstStep({ mode }: UserFirstStepProps) {
             />
           </Grid.Col>
 
-          <Grid.Col span={{ base: 12, sm: 4 }}>
+          <Grid.Col span={{ base: 12, sm: 3 }}>
             <TextInput
               {...register("additionalInfo")}
               id="create-user-complement"
@@ -333,7 +385,7 @@ export function UserFirstStep({ mode }: UserFirstStepProps) {
             />
           </Grid.Col>
 
-          <Grid.Col span={{ base: 12, sm: 4 }}>
+          <Grid.Col span={{ base: 12, sm: 3 }}>
             <TextInput
               {...register("neighborhood")}
               id="create-user-neighborhood"
@@ -344,18 +396,7 @@ export function UserFirstStep({ mode }: UserFirstStepProps) {
             />
           </Grid.Col>
 
-          <Grid.Col span={{ base: 12, sm: 3 }}>
-            <TextInput
-              {...register("addressCity")}
-              id="create-user-city"
-              label="Cidade"
-              placeholder="Cidade"
-              required
-              error={errors.addressCity?.message}
-            />
-          </Grid.Col>
-
-          <Grid.Col span={{ base: 12, sm: 1 }}>
+          <Grid.Col span={{ base: 12, sm: 2 }}>
             <Controller
               name="addressState"
               control={control}
@@ -368,7 +409,38 @@ export function UserFirstStep({ mode }: UserFirstStepProps) {
                   data={[...brazilianStates]}
                   required
                   searchable
+                  clearable
+                  nothingFoundMessage="Nenhum estado encontrado"
                   error={errors.addressState?.message}
+                  value={field.value || null}
+                  onChange={(val) => {
+                    field.onChange(val ?? "");
+                    setValue("addressCity", "", { shouldValidate: true });
+                  }}
+                />
+              )}
+            />
+          </Grid.Col>
+
+          <Grid.Col span={{ base: 12, sm: 4 }}>
+            <Controller
+              name="addressCity"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  id="create-user-city"
+                  label="Cidade"
+                  placeholder={citiesLoading ? "Carregando cidades..." : "Selecione a cidade"}
+                  data={stateCities}
+                  required
+                  searchable
+                  clearable
+                  nothingFoundMessage="Nenhuma cidade encontrada"
+                  disabled={citiesLoading || stateCities.length === 0}
+                  error={errors.addressCity?.message}
+                  value={field.value || null}
+                  onChange={(val) => field.onChange(val ?? "")}
                 />
               )}
             />
