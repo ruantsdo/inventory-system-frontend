@@ -54,9 +54,11 @@ export function ManufacturersPage() {
 
   async function handleConfirmDelete() {
     if (deletingTarget) {
-      await handleDelete(deletingTarget.id);
-      setDeletingTarget(null);
-      closeDelete();
+      try {
+        await handleDelete(deletingTarget.id);
+        setDeletingTarget(null);
+        closeDelete();
+      } catch {}
     }
   }
 
@@ -167,4 +169,3 @@ export function ManufacturersPage() {
     </Box>
   );
 }
-

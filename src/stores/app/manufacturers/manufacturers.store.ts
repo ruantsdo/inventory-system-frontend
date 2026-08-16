@@ -1,3 +1,4 @@
+import { notifications } from "@mantine/notifications";
 import { create } from "zustand";
 import * as manufacturersService from "../../../services/manufacturers";
 import type {
@@ -106,8 +107,18 @@ export const useManufacturersStore = create<ManufacturersState>((set, get) => ({
     try {
       if (id) {
         await manufacturersService.updateManufacturer(id, payload as UpdateManufacturerPayload);
+        notifications.show({
+          title: "Fabricante atualizado",
+          message: "Fabricante atualizado com sucesso.",
+          color: "var(--status-success)",
+        });
       } else {
         await manufacturersService.createManufacturer(payload as CreateManufacturerPayload);
+        notifications.show({
+          title: "Fabricante cadastrado",
+          message: "Fabricante cadastrado com sucesso.",
+          color: "var(--status-success)",
+        });
       }
       set({ isFormModalOpen: false, editingManufacturer: null, page: 1 });
       await get().fetchManufacturers();
@@ -120,6 +131,11 @@ export const useManufacturersStore = create<ManufacturersState>((set, get) => ({
     set({ deleting: true });
     try {
       await manufacturersService.deleteManufacturer(id);
+      notifications.show({
+        title: "Fabricante removido",
+        message: "Fabricante removido com sucesso.",
+        color: "var(--status-success)",
+      });
       await get().fetchManufacturers();
     } finally {
       set({ deleting: false });
