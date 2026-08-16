@@ -18,13 +18,24 @@ import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FaIndustry } from "react-icons/fa";
 import { withMask } from "use-mask-input";
-import { z } from "zod";
 import { brazilianStates } from "../../../../enums";
+import { manufacturerFormSchema } from "../../../../schemas/manufacturers";
 import { getCitiesByState } from "../../../../services/geo";
 import { useReferenceDataStore } from "../../../../stores/utils";
-import type { ManufacturerOutput } from "../../../../types/api.contracts";
-import type { ManufacturerFormValues } from "../../../../types/manufacturers";
-import { resolveStateUf } from "../../../../utils";
+import type {
+  CreateManufacturerPayload,
+  ManufacturerOutput,
+  UpdateManufacturerPayload,
+} from "../../../../types/api.contracts";
+import {
+  EMPTY_MANUFACTURER_FORM,
+  type ManufacturerFormValues,
+} from "../../../../types/manufacturers";
+import {
+  buildManufacturerPayload,
+  isManufacturerFormUnchanged,
+  resolveStateUf,
+} from "../../../../utils";
 
 interface ManufacturerFormModalProps {
   opened: boolean;
@@ -32,31 +43,10 @@ interface ManufacturerFormModalProps {
   editing: ManufacturerOutput | null;
   saving: boolean;
   onSave: (
-    payload: {
-      name: string;
-      cnpj?: string;
-      cityId?: string;
-      contact?: { email?: string; phone?: string; contactPerson?: string };
-    },
+    payload: CreateManufacturerPayload | UpdateManufacturerPayload,
     id?: string,
   ) => Promise<void>;
 }
-
-const manufacturerFormSchema = z.object({
-  name: z.string().min(2, "Nome deve ter ao menos 2 caracteres"),
-  cnpj: z.string(),
-  state: z.string().optional(),
-  cityId: z.string().optional(),
-  contactPerson: z.string(),
-  email: z
-    .string()
-    .refine((v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), {
-      message: "E-mail inválido",
-    }),
-  phone: z.string(),
-});
-
-type FormValues = ManufacturerFormValues;
 
 export function ManufacturerFormModal({
   opened,
@@ -79,18 +69,11 @@ export function ManufacturerFormModal({
     reset,
     watch,
     setValue,
-    formState: { errors },
-  } = useForm<FormValues>({
+    formState: { errors, isDirty },
+  } = useForm<ManufacturerFormValues>({
     resolver: zodResolver(manufacturerFormSchema),
-    defaultValues: {
-      name: "",
-      cnpj: "",
-      state: "",
-      cityId: "",
-      contactPerson: "",
-      email: "",
-      phone: "",
-    },
+    defaultValues: EMPTY_MANUFACTURER_FORM,
+    mode: "onChange",
   });
 
   const selectedState = watch("state");
@@ -114,13 +97,8 @@ export function ManufacturerFormModal({
         const defaultUf = resolveStateUf(activeCity?.state);
 
         reset({
-          name: "",
-          cnpj: "",
+          ...EMPTY_MANUFACTURER_FORM,
           state: defaultUf,
-          cityId: "",
-          contactPerson: "",
-          email: "",
-          phone: "",
         });
       }
     }
@@ -157,21 +135,18 @@ export function ManufacturerFormModal({
     };
   }, [selectedState]);
 
-  async function onSubmit(values: FormValues) {
-    const payload = {
-      name: values.name.trim(),
-      cnpj: values.cnpj.trim() || undefined,
-      cityId: values.cityId || undefined,
-      contact:
-        values.contactPerson || values.email || values.phone
-          ? {
-              contactPerson: values.contactPerson.trim() || undefined,
-              email: values.email.trim() || undefined,
-              phone: values.phone.trim() || undefined,
-            }
-          : undefined,
-    };
-    await onSave(payload, editing?.id);
+  async function onSubmit(values: ManufacturerFormValues) {
+    if (editing && (!isDirty || isManufacturerFormUnchanged(values, editing))) {
+      onClose();
+      return;
+    }
+
+    const payload = buildManufacturerPayload(values);
+    try {
+      await onSave(payload, editing?.id);
+    } catch {
+      // Erro já tratado pelo interceptor global do apiClient
+    }
   }
 
   return (
@@ -227,6 +202,7 @@ export function ManufacturerFormModal({
                     id="manufacturer-form-cnpj"
                     label="CNPJ"
                     placeholder="00.000.000/0000-00"
+                    required
                     radius="md"
                     {...field}
                     ref={(el) => {
@@ -234,6 +210,7 @@ export function ManufacturerFormModal({
                       if (el) withMask("99.999.999/9999-99")(el);
                     }}
                     error={errors.cnpj?.message}
+                    maxLength={18}
                   />
                 )}
               />
@@ -324,6 +301,7 @@ export function ManufacturerFormModal({
                     label="E-mail"
                     placeholder="contato@fabricante.com"
                     radius="md"
+                    type="email"
                     {...field}
                     error={errors.email?.message}
                   />
@@ -339,7 +317,12 @@ export function ManufacturerFormModal({
                     placeholder="(00) 00000-0000"
                     radius="md"
                     {...field}
+                    ref={(el) => {
+                      field.ref(el);
+                      if (el) withMask("(99) 99999-9999")(el);
+                    }}
                     error={errors.phone?.message}
+                    maxLength={16}
                   />
                 )}
               />
