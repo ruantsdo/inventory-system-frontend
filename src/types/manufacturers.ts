@@ -1,3 +1,4 @@
+import type { ManufacturerFormValues } from "../schemas/manufacturers";
 import type {
   CreateManufacturerPayload,
   ManufacturerItemOutput,
@@ -7,17 +8,18 @@ import type {
   UpdateManufacturerPayload,
 } from "./api.contracts";
 
-export interface ManufacturerFormValues {
-  name: string;
-  cnpj: string;
-  state?: string;
-  cityId?: string;
-  contactPerson: string;
-  email: string;
-  phone: string;
-}
+export const EMPTY_MANUFACTURER_FORM: ManufacturerFormValues = {
+  name: "",
+  cnpj: "",
+  state: "",
+  cityId: "",
+  contactPerson: "",
+  email: "",
+  phone: "",
+};
 
 export type {
+  ManufacturerFormValues,
   CreateManufacturerPayload,
   UpdateManufacturerPayload,
   ManufacturerOutput,
