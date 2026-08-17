@@ -30,7 +30,7 @@ export function ManufacturersFilters({
     <Box className="flex flex-col sm:flex-row gap-3 items-start sm:items-end flex-wrap">
       <TextInput
         id="manufacturers-search-input"
-        placeholder="Buscar por nome ou CNPJ..."
+        placeholder="Buscar por nome, marca ou CNPJ..."
         leftSection={<FaSearch size={13} />}
         value={localSearch}
         onChange={(e) => setLocalSearch(e.currentTarget.value)}

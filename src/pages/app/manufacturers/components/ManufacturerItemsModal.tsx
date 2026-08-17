@@ -27,7 +27,6 @@ function ItemRowSkeleton() {
   return (
     <Table.Tr>
       {Array.from({ length: 4 }).map((_, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: skeleton rows are static placeholders
         <Table.Td key={i}>
           <Skeleton height={18} radius="sm" />
         </Table.Td>
@@ -70,7 +69,6 @@ export function ManufacturerItemsModal({
 
   const rows = manufacturerItemsLoading
     ? Array.from({ length: 5 }).map((_, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton rows
         <ItemRowSkeleton key={i} />
       ))
     : manufacturerItems.map((item) => (

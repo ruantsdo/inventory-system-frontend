@@ -12,7 +12,18 @@ import {
   ThemeIcon,
   Tooltip,
 } from "@mantine/core";
-import { FaBoxes, FaBuilding, FaEnvelope, FaIndustry, FaLayerGroup, FaMapMarkerAlt, FaPhone, FaUser } from "react-icons/fa";
+import {
+  FaBoxes,
+  FaBuilding,
+  FaEnvelope,
+  FaExternalLinkAlt,
+  FaIndustry,
+  FaLayerGroup,
+  FaMapMarkerAlt,
+  FaPhone,
+  FaUser,
+} from "react-icons/fa";
+import { countries } from "../../../../enums";
 import type { ManufacturerOutput } from "../../../../types/api.contracts";
 import { formatToBrDate } from "../../../../utils/date.utils";
 
@@ -38,7 +49,7 @@ function SectionHeader({ icon, label }: { icon: React.ReactNode; label: string }
   );
 }
 
-function InfoRow({ label, value }: { label: string; value?: string | null }) {
+function InfoRow({ label, value }: { label: string; value?: React.ReactNode }) {
   return (
     <Group justify="flex-start" align="flex-start" gap="xs">
       <Text size="xs" c="dimmed" style={{ minWidth: 140 }}>
@@ -61,6 +72,19 @@ export function ManufacturerDetailModal({
 }: ManufacturerDetailModalProps) {
   const itemCount = detail?._count?.items ?? 0;
   const batchCount = detail?._count?.batches ?? 0;
+  const countryName = countries.find((c) => c.value === detail?.country)?.label || detail?.country || "Brasil";
+
+  const formattedAddress = detail?.address
+    ? [
+        detail.address.street,
+        detail.address.number,
+        detail.address.complement,
+        detail.address.neighborhood,
+        detail.address.zipCode ? `CEP ${detail.address.zipCode}` : null,
+      ]
+        .filter(Boolean)
+        .join(", ")
+    : null;
 
   return (
     <Modal
@@ -94,27 +118,49 @@ export function ManufacturerDetailModal({
       {!loading && detail && (
         <Stack gap="lg">
           <Box>
-            <SectionHeader icon={<FaBuilding size={10} />} label="Identificação" />
+            <Group justify="space-between" align="center" mb="sm">
+              <SectionHeader icon={<FaBuilding size={10} />} label="Identificação" />
+              <Badge variant="light" color={detail.isActive ? "green" : "gray"} radius="sm">
+                {detail.isActive ? "Ativo" : "Inativo"}
+              </Badge>
+            </Group>
             <Stack gap={6}>
-              <InfoRow label="Nome / Razão Social" value={detail.name} />
+              <InfoRow label="Razão Social" value={detail.name} />
+              <InfoRow label="Nome Fantasia / Marca" value={detail.tradeName} />
               <InfoRow label="CNPJ" value={detail.cnpj} />
+              <InfoRow label="País de Origem" value={countryName} />
+              <InfoRow label="Código Regulatório" value={detail.regulatoryCode} />
+              {detail.website && (
+                <InfoRow
+                  label="Website Oficial"
+                  value={
+                    <a
+                      href={detail.website.startsWith("http") ? detail.website : `https://${detail.website}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:underline inline-flex items-center gap-1"
+                    >
+                      {detail.website} <FaExternalLinkAlt size={9} />
+                    </a>
+                  }
+                />
+              )}
               <InfoRow label="Cadastrado em" value={formatToBrDate(String(detail.createdAt))} />
               <InfoRow label="Atualizado em" value={formatToBrDate(String(detail.updatedAt))} />
             </Stack>
           </Box>
 
-          {detail.city && (
-            <>
-              <Divider />
-              <Box>
-                <SectionHeader icon={<FaMapMarkerAlt size={10} />} label="Localização" />
-                <Stack gap={6}>
-                  <InfoRow label="Cidade" value={detail.city.name} />
-                  <InfoRow label="Estado" value={detail.city.state} />
-                </Stack>
-              </Box>
-            </>
-          )}
+          <Divider />
+
+          <Box>
+            <SectionHeader icon={<FaMapMarkerAlt size={10} />} label="Localização e Endereço" />
+            <Stack gap={6}>
+              {detail.city && (
+                <InfoRow label="Cidade / Estado" value={`${detail.city.name}${detail.city.state ? ` / ${detail.city.state}` : ""}`} />
+              )}
+              <InfoRow label="Endereço" value={formattedAddress} />
+            </Stack>
+          </Box>
 
           {detail.contact && (
             <>
@@ -160,34 +206,24 @@ export function ManufacturerDetailModal({
                   size="xs"
                   variant="light"
                   radius="md"
+                  leftSection={<FaBoxes size={11} />}
                   onClick={onViewItems}
                   disabled={itemCount === 0}
                 >
-                  Ver Itens
+                  Visualizar Itens do Fabricante
                 </Button>
               ) : (
-                <Tooltip
-                  label="Você não possui permissão para visualizar itens"
-                  withArrow
-                  position="right"
-                >
-                  <Button size="xs" variant="light" radius="md" disabled>
-                    Ver Itens
-                  </Button>
+                <Tooltip label="Você não tem permissão para visualizar itens" withArrow>
+                  <span>
+                    <Button size="xs" variant="light" radius="md" disabled>
+                      Visualizar Itens do Fabricante
+                    </Button>
+                  </span>
                 </Tooltip>
               )}
             </Group>
           </Box>
         </Stack>
-      )}
-
-      {!loading && !detail && (
-        <Box className="flex flex-col items-center justify-center py-16 gap-2">
-          <FaIndustry size={24} color="var(--text-secondary)" />
-          <Text size="sm" c="var(--text-secondary)">
-            Não foi possível carregar os detalhes.
-          </Text>
-        </Box>
       )}
     </Modal>
   );

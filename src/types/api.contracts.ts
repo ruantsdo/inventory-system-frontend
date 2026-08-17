@@ -196,35 +196,59 @@ export interface DetailAuditOutput extends AuditOutput {
   after: Record<string, unknown>;
 }
 
-// MANUFACTURERS
-
 export interface ManufacturerContactPayload {
   email?: string | undefined;
   phone?: string | undefined;
   contactPerson?: string | undefined;
 }
 
+export interface ManufacturerAddressPayload {
+  zipCode?: string | undefined;
+  street?: string | undefined;
+  number?: string | undefined;
+  complement?: string | undefined;
+  neighborhood?: string | undefined;
+}
+
 export interface CreateManufacturerPayload {
   name: string;
+  tradeName?: string | undefined;
   cnpj?: string | undefined;
+  country?: string | undefined;
+  website?: string | undefined;
+  regulatoryCode?: string | undefined;
   contact?: ManufacturerContactPayload | undefined;
+  address?: ManufacturerAddressPayload | undefined;
   cityId?: string | undefined;
+  isActive?: boolean | undefined;
 }
 
 export interface UpdateManufacturerPayload {
   name?: string | undefined;
+  tradeName?: string | undefined;
   cnpj?: string | undefined;
+  country?: string | undefined;
+  website?: string | undefined;
+  regulatoryCode?: string | undefined;
   contact?: ManufacturerContactPayload | undefined;
+  address?: ManufacturerAddressPayload | undefined;
   cityId?: string | undefined;
+  isActive?: boolean | undefined;
 }
 
 export interface ManufacturerOutput {
   id: ID;
   name: string;
+  tradeName: string | null;
   cnpj: string | null;
+  country: string;
+  website: string | null;
+  regulatoryCode: string | null;
   contact: ManufacturerContactPayload | null;
+  address: ManufacturerAddressPayload | null;
   cityId: string | null;
   city?: { id: ID; name: string; state: string | null } | null;
+  isActive: boolean;
   createdByUserId?: string | null;
   updatedByUserId?: string | null;
   createdAt: string | Date;
@@ -262,4 +286,3 @@ export interface PaginatedManufacturerItemsOutput {
   totalPages: number;
   data: ManufacturerItemOutput[];
 }
-
