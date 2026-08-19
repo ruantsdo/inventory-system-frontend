@@ -78,7 +78,6 @@ export function ManufacturerDetailModal({
     ? [
         detail.address.street,
         detail.address.number,
-        detail.address.complement,
         detail.address.neighborhood,
         detail.address.zipCode ? `CEP ${detail.address.zipCode}` : null,
       ]
@@ -159,6 +158,7 @@ export function ManufacturerDetailModal({
                 <InfoRow label="Cidade / Estado" value={`${detail.city.name}${detail.city.state ? ` / ${detail.city.state}` : ""}`} />
               )}
               <InfoRow label="Endereço" value={formattedAddress} />
+              <InfoRow label="Complemento" value={detail.address?.complement} />
             </Stack>
           </Box>
 

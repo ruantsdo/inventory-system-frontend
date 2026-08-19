@@ -26,7 +26,12 @@ export function buildManufacturerPayload(
     country: form.country || "BR",
     cnpj: form.cnpj ? form.cnpj.replace(/\D/g, "") : undefined,
     regulatoryCode: form.regulatoryCode?.trim() || undefined,
-    website: form.website?.trim() || undefined,
+    website: (() => {
+      const raw = form.website?.trim();
+      if (!raw) return undefined;
+      if (raw.startsWith("http://") || raw.startsWith("https://")) return raw;
+      return `https://${raw}`;
+    })(),
     cityId: form.cityId || undefined,
     isActive: form.isActive !== undefined ? form.isActive : true,
     contact: hasContact
