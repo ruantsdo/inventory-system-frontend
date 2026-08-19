@@ -14,11 +14,13 @@ interface ManufacturerEnvelope {
 
 export async function getManufacturers(
   page = 1,
-  limit = 10,
+  limit = 1000,
   search?: string,
+  isActive?: boolean,
 ): Promise<PaginatedManufacturersOutput> {
   const params = new URLSearchParams({ page: String(page), limit: String(limit) });
   if (search) params.set("search", search);
+  if (isActive !== undefined) params.set("isActive", String(isActive));
   const { data } = await apiClient.get<PaginatedManufacturersOutput>(
     `/api/manufacturers?${params.toString()}`,
   );

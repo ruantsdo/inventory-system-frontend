@@ -11,9 +11,10 @@ export const useManufacturersStore = create<ManufacturersState>((set, get) => ({
   manufacturers: [],
   total: 0,
   page: 1,
-  limit: 10,
+  limit: 1000,
   totalPages: 0,
   search: "",
+  isActive: undefined,
 
   selectedDetail: null,
   loadingDetail: false,
@@ -34,10 +35,10 @@ export const useManufacturersStore = create<ManufacturersState>((set, get) => ({
   error: null,
 
   fetchManufacturers: async () => {
-    const { page, limit, search } = get();
+    const { page, limit, search, isActive } = get();
     set({ loading: true, error: null });
     try {
-      const result = await manufacturersService.getManufacturers(page, limit, search || undefined);
+      const result = await manufacturersService.getManufacturers(page, limit, search || undefined, isActive);
       set({
         manufacturers: result.data,
         total: result.total,
@@ -54,6 +55,8 @@ export const useManufacturersStore = create<ManufacturersState>((set, get) => ({
 
   setSearch: (search) => set({ search, page: 1 }),
 
+  setIsActive: (isActive) => set({ isActive, page: 1 }),
+
   fetchManufacturerDetail: async (id: string) => {
     set({ loadingDetail: true });
     try {
@@ -69,10 +72,10 @@ export const useManufacturersStore = create<ManufacturersState>((set, get) => ({
   clearSelectedDetail: () => set({ selectedDetail: null }),
 
   fetchManufacturerItems: async (id: string, page = 1) => {
+    const ITEMS_PAGE_LIMIT = 20;
     set({ manufacturerItemsLoading: true, manufacturerItemsPage: page });
     try {
-      const { limit } = get();
-      const result = await manufacturersService.getManufacturerItems(id, page, limit);
+      const result = await manufacturersService.getManufacturerItems(id, page, ITEMS_PAGE_LIMIT);
       set({
         manufacturerItems: result.data,
         manufacturerItemsTotal: result.total,

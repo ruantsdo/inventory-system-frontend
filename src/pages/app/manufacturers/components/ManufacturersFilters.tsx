@@ -1,4 +1,4 @@
-import { Box, Button, TextInput } from "@mantine/core";
+import { Box, Button, Select, TextInput } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { FaSearch, FaTimes } from "react-icons/fa";
@@ -7,12 +7,16 @@ interface ManufacturersFiltersProps {
   search: string;
   onSearchChange: (value: string) => void;
   onClearSearch: () => void;
+  isActiveFilter: string | null;
+  onIsActiveFilterChange: (value: string | null) => void;
 }
 
 export function ManufacturersFilters({
   search,
   onSearchChange,
   onClearSearch,
+  isActiveFilter,
+  onIsActiveFilterChange,
 }: ManufacturersFiltersProps) {
   const [localSearch, setLocalSearch] = useState(search);
   const [debounced] = useDebouncedValue(localSearch, 500);
@@ -38,16 +42,33 @@ export function ManufacturersFilters({
         style={{ minWidth: 300 }}
       />
 
-      {localSearch && (
+      <Select
+        id="manufacturers-status-filter"
+        placeholder="Todos os status"
+        data={[
+          { value: "true", label: "Ativos" },
+          { value: "false", label: "Inativos" },
+        ]}
+        value={isActiveFilter}
+        onChange={onIsActiveFilterChange}
+        clearable
+        radius="md"
+        style={{ minWidth: 160 }}
+      />
+
+      {(localSearch || isActiveFilter) && (
         <Button
           id="manufacturers-clear-search-btn"
           variant="subtle"
           leftSection={<FaTimes size={12} />}
           radius="md"
-          onClick={handleClear}
+          onClick={() => {
+            handleClear();
+            onIsActiveFilterChange(null);
+          }}
           color="gray"
         >
-          Limpar
+          Limpar filtros
         </Button>
       )}
     </Box>

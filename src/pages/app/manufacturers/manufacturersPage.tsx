@@ -18,6 +18,7 @@ export function ManufacturersPage() {
     page,
     totalPages,
     search,
+    isActive,
     selectedDetail,
     loadingDetail,
     editingManufacturer,
@@ -30,6 +31,7 @@ export function ManufacturersPage() {
     handlePageChange,
     handleSearchChange,
     handleClearSearch,
+    handleIsActiveFilterChange,
     handleViewDetail,
     handleCloseDetail,
     handleOpenCreate,
@@ -78,6 +80,8 @@ export function ManufacturersPage() {
         search={search}
         onSearchChange={handleSearchChange}
         onClearSearch={handleClearSearch}
+        isActiveFilter={isActive === undefined ? null : String(isActive)}
+        onIsActiveFilterChange={handleIsActiveFilterChange}
       />
 
       {error && !loading && (
@@ -100,20 +104,23 @@ export function ManufacturersPage() {
         onDelete={handleDeleteClick}
       />
 
-      {!loading && totalPages > 1 && (
+      {!loading && manufacturers.length > 0 && (
         <Group justify="space-between" align="center">
           <Text size="sm" c="var(--text-secondary)">
-            Página <strong>{page}</strong> de <strong>{totalPages}</strong>
+            Página <strong>{page}</strong> · {manufacturers.length} registros exibidos
           </Text>
-          <Pagination
-            id="manufacturers-pagination"
-            total={totalPages}
-            value={page}
-            onChange={handlePageChange}
-            radius="md"
-            size="sm"
-            color="green"
-          />
+
+          {totalPages > 1 && (
+            <Pagination
+              id="manufacturers-pagination"
+              total={totalPages}
+              value={page}
+              onChange={handlePageChange}
+              radius="md"
+              size="sm"
+              color="green"
+            />
+          )}
         </Group>
       )}
 

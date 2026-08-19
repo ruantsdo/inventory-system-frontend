@@ -11,6 +11,7 @@ export function useManufacturers() {
     limit,
     totalPages,
     search,
+    isActive,
     selectedDetail,
     loadingDetail,
     editingManufacturer,
@@ -22,6 +23,7 @@ export function useManufacturers() {
     fetchManufacturers,
     setPage,
     setSearch,
+    setIsActive,
     fetchManufacturerDetail,
     clearSelectedDetail,
     openCreateModal,
@@ -37,7 +39,7 @@ export function useManufacturers() {
 
   useEffect(() => {
     fetchManufacturers();
-  }, [fetchManufacturers, page, search]);
+  }, [fetchManufacturers, page, search, isActive]);
 
   const handlePageChange = useCallback(
     (newPage: number) => setPage(newPage),
@@ -47,6 +49,15 @@ export function useManufacturers() {
   const handleSearchChange = useCallback(
     (value: string) => setSearch(value),
     [setSearch],
+  );
+
+  const handleIsActiveFilterChange = useCallback(
+    (value: string | null) => {
+      if (value === "true") setIsActive(true);
+      else if (value === "false") setIsActive(false);
+      else setIsActive(undefined);
+    },
+    [setIsActive],
   );
 
   const handleClearSearch = useCallback(() => setSearch(""), [setSearch]);
@@ -63,6 +74,7 @@ export function useManufacturers() {
     limit,
     totalPages,
     search,
+    isActive,
     selectedDetail,
     loadingDetail,
     editingManufacturer,
@@ -75,6 +87,7 @@ export function useManufacturers() {
     handlePageChange,
     handleSearchChange,
     handleClearSearch,
+    handleIsActiveFilterChange,
     handleViewDetail,
     handleCloseDetail: clearSelectedDetail,
     handleOpenCreate: openCreateModal,

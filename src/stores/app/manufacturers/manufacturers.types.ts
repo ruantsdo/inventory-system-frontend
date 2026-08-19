@@ -12,6 +12,7 @@ export interface ManufacturersState {
   limit: number;
   totalPages: number;
   search: string;
+  isActive: boolean | undefined;
 
   selectedDetail: ManufacturerOutput | null;
   loadingDetail: boolean;
@@ -34,6 +35,7 @@ export interface ManufacturersState {
   fetchManufacturers: () => Promise<void>;
   setPage: (page: number) => void;
   setSearch: (search: string) => void;
+  setIsActive: (isActive: boolean | undefined) => void;
 
   fetchManufacturerDetail: (id: string) => Promise<void>;
   clearSelectedDetail: () => void;
