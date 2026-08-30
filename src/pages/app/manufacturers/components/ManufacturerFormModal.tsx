@@ -183,7 +183,7 @@ export function ManufacturerFormModal({
       radius="lg"
       scrollAreaComponent={ScrollArea.Autosize}
     >
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)} noValidate>
         <Stack gap="md">
           <Box>
             <Title order={6} c="var(--text-secondary)" mb="xs">
