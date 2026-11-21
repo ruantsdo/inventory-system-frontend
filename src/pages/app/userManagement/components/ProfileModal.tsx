@@ -22,8 +22,7 @@ import {
   FaShieldAlt,
   FaUser,
 } from "react-icons/fa";
-import { getSelfData } from "../../../../services/users";
-import { useUserManagementStore } from "../../../../stores/app/userManagement";
+import { getSelfData, getUserDataByID } from "../../../../services/users";
 import { useAuthStore } from "../../../../stores/auth";
 import { useUtilsStore } from "../../../../stores/utils";
 import type { UserData } from "../../../../types/user";
@@ -75,7 +74,7 @@ function InfoRow({ label, value }: { label: string; value?: string | null }) {
 }
 
 export function ProfileModal({ opened, handleClose, targetId }: ProfileModalProps) {
-  const { getUserDataByID, loading } = useUserManagementStore();
+  const [loading, setLoading] = useState(false);
   const { handleNavigation } = useUtilsStore();
   const { currentSession } = useAuthStore();
   const [user, setUser] = useState<UserData>();
@@ -86,20 +85,27 @@ export function ProfileModal({ opened, handleClose, targetId }: ProfileModalProp
   const modalTitle = isAutenticadedUser ? "Meu Perfil" : "Informações do usuário";
 
   const fetchUserData = async () => {
-    let userData: UserData;
-    if (isAutenticadedUser) {
-      userData = await getSelfData();
-    } else {
-      userData = await getUserDataByID(targetId);
+    setLoading(true);
+    try {
+      let userData: UserData;
+      if (isAutenticadedUser) {
+        userData = await getSelfData();
+      } else {
+        userData = await getUserDataByID(targetId);
+      }
+      setAdress(buildFullAdressString(userData));
+      setUser(userData);
+    } catch {
+      setUser(undefined);
+    } finally {
+      setLoading(false);
     }
-    setAdress(buildFullAdressString(userData));
-    setUser(userData);
   };
 
   const handleEdit = () => {
-    const targetId = currentSession?.user?.id;
-    if (!targetId) return;
-    handleNavigation(`/users/edit/${targetId}`, "users.update");
+    const currentUserId = currentSession?.user?.id;
+    if (!currentUserId) return;
+    handleNavigation(`/users/edit/${currentUserId}`, "users.update");
     handleClose();
   };
 

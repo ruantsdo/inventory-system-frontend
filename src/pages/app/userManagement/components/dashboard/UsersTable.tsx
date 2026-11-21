@@ -13,10 +13,11 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { FaEdit, FaEye, FaPause, FaPlay, FaTrash } from "react-icons/fa";
+import { ActionConfirmModal } from "../../../../../components";
+import * as usersService from "../../../../../services/users";
 import { useUtilsStore } from "../../../../../stores/utils";
 import type { UserListItem } from "../../../../../types/usersDashboard";
 import { ProfileModal } from "../ProfileModal";
-import { UserActionConfirmModal } from "../UserActionConfirmModal";
 
 interface UsersTableProps {
   users: UserListItem[];
@@ -49,6 +50,7 @@ export function UsersTable({ users, loading, refetch }: UsersTableProps) {
   const [userId, setTargetId] = useState<string>("");
 
   const [confirmModalOpened, setConfirmModalOpened] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
   const [confirmAction, setConfirmAction] = useState<"delete" | "deactivate" | "reactivate">(
     "delete",
   );
@@ -73,6 +75,24 @@ export function UsersTable({ users, loading, refetch }: UsersTableProps) {
     setTargetUser(user);
     setConfirmAction(user.isActive ? "deactivate" : "reactivate");
     setConfirmModalOpened(true);
+  };
+
+  const handleConfirmAction = async () => {
+    if (!targetUser) return;
+    setActionLoading(true);
+    try {
+      if (confirmAction === "delete") {
+        await usersService.deleteUser(targetUser.id);
+      } else if (confirmAction === "deactivate") {
+        await usersService.deactivateUser(targetUser.id);
+      } else {
+        await usersService.reactivateUser(targetUser.id);
+      }
+      setConfirmModalOpened(false);
+      await refetch();
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   const rows = loading
@@ -124,7 +144,7 @@ export function UsersTable({ users, loading, refetch }: UsersTableProps) {
               </Tooltip>
 
               {canUpdate && (
-                <Tooltip label="Editar usuário" withArrow position="top">
+                <Tooltip label="Editar" withArrow position="top">
                   <ActionIcon
                     id={`user-edit-${user.id}`}
                     variant="subtle"
@@ -138,28 +158,38 @@ export function UsersTable({ users, loading, refetch }: UsersTableProps) {
                 </Tooltip>
               )}
 
-              {(canActivate || canDeactivate) && (
-                <Tooltip
-                  label={user.isActive ? "Desativar usuário" : "Ativar usuário"}
-                  withArrow
-                  position="top"
-                >
+              {user.isActive && canDeactivate && (
+                <Tooltip label="Desativar" withArrow position="top">
                   <ActionIcon
-                    id={`user-delete-${user.id}`}
+                    id={`user-deactivate-${user.id}`}
                     variant="subtle"
                     color="orange"
                     size="sm"
                     radius="md"
-                    disabled={user.isActive ? !canDeactivate : !canActivate}
                     onClick={() => handleChangeUserState(user)}
                   >
-                    {user.isActive ? <FaPause size={13} /> : <FaPlay size={13} />}
+                    <FaPause size={12} />
+                  </ActionIcon>
+                </Tooltip>
+              )}
+
+              {!user.isActive && canActivate && (
+                <Tooltip label="Ativar" withArrow position="top">
+                  <ActionIcon
+                    id={`user-activate-${user.id}`}
+                    variant="subtle"
+                    color="teal"
+                    size="sm"
+                    radius="md"
+                    onClick={() => handleChangeUserState(user)}
+                  >
+                    <FaPlay size={12} />
                   </ActionIcon>
                 </Tooltip>
               )}
 
               {canDelete && (
-                <Tooltip label="Deletar usuário" withArrow position="top">
+                <Tooltip label="Remover" withArrow position="top">
                   <ActionIcon
                     id={`user-delete-${user.id}`}
                     variant="subtle"
@@ -168,7 +198,7 @@ export function UsersTable({ users, loading, refetch }: UsersTableProps) {
                     radius="md"
                     onClick={() => handleDeleteClick(user)}
                   >
-                    <FaTrash size={13} />
+                    <FaTrash size={12} />
                   </ActionIcon>
                 </Tooltip>
               )}
@@ -178,35 +208,23 @@ export function UsersTable({ users, loading, refetch }: UsersTableProps) {
       ));
 
   return (
-    <Paper radius="lg" className="bg-surface border border-border overflow-hidden">
-      <Table striped highlightOnHover verticalSpacing="sm" horizontalSpacing="md" stickyHeader>
-        <Table.Thead>
+    <Paper radius="md" withBorder className="border-border bg-surface overflow-hidden">
+      <Table verticalSpacing="sm" horizontalSpacing="md" highlightOnHover>
+        <Table.Thead className="bg-background">
           <Table.Tr>
-            <Table.Th>
-              <Text size="xs" tt="uppercase" fw={700} c="var(--text-secondary)">
-                Usuário
-              </Text>
-            </Table.Th>
-            <Table.Th>
-              <Text size="xs" tt="uppercase" fw={700} c="var(--text-secondary)">
-                Cargo
-              </Text>
-            </Table.Th>
-            <Table.Th>
-              <Text size="xs" tt="uppercase" fw={700} c="var(--text-secondary)">
-                Status
-              </Text>
-            </Table.Th>
-            <Table.Th />
+            <Table.Th>Usuário</Table.Th>
+            <Table.Th>Cargos</Table.Th>
+            <Table.Th>Status</Table.Th>
+            <Table.Th style={{ textAlign: "right" }}>Ações</Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
-          {!loading && users.length === 0 ? (
+          {users.length === 0 && !loading ? (
             <Table.Tr>
               <Table.Td colSpan={4}>
-                <Box className="flex flex-col items-center justify-center py-12 gap-2">
+                <Box py="xl" ta="center">
                   <Text size="sm" c="var(--text-secondary)">
-                    Nenhum usuário encontrado para os filtros aplicados.
+                    Nenhum usuário encontrado.
                   </Text>
                 </Box>
               </Table.Td>
@@ -218,12 +236,21 @@ export function UsersTable({ users, loading, refetch }: UsersTableProps) {
       </Table>
       {opened && <ProfileModal opened={opened} handleClose={close} targetId={userId} />}
       {confirmModalOpened && targetUser && (
-        <UserActionConfirmModal
+        <ActionConfirmModal
           opened={confirmModalOpened}
           onClose={() => setConfirmModalOpened(false)}
-          user={targetUser}
           action={confirmAction}
-          onSuccess={refetch}
+          loading={actionLoading}
+          onConfirm={handleConfirmAction}
+          itemDetails={{
+            avatar: { name: targetUser.fullName },
+            title: targetUser.fullName,
+            subtitle: targetUser.email,
+            badge:
+              targetUser.roles && targetUser.roles.length > 0
+                ? targetUser.roles.map((r) => r.role.displayName).join(", ")
+                : undefined,
+          }}
         />
       )}
     </Paper>
