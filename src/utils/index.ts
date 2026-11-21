@@ -1,4 +1,9 @@
-import { formatBrDateToIso, formatToBrDate } from "./date.utils";
+import {
+  formatBrDateToIso,
+  formatToBrDate,
+  getFormattedDate,
+  getGreeting,
+} from "./date.utils";
 import { resolveStateUf } from "./geo.utils";
 import { buildManufacturerPayload, isManufacturerFormUnchanged } from "./manufacturers.utils";
 import { navigationHelper } from "./navigation.utils";
@@ -9,11 +14,11 @@ export {
   permissionsUtils,
   formatBrDateToIso,
   formatToBrDate,
+  getGreeting,
+  getFormattedDate,
   resolveStateUf,
   buildUserPayload,
   buildManufacturerPayload,
   isManufacturerFormUnchanged,
   navigationHelper,
 };
-
-

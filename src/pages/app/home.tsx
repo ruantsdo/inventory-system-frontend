@@ -5,11 +5,10 @@ import { ConsumptionChart } from "../../components/ConsumptionChart";
 import { RecentMovements } from "../../components/RecentMovements";
 import { StatCard } from "../../components/StatCard";
 import { useAuthStore } from "../../stores/auth";
-import { useTimingStore } from "../../stores/utils";
+import { getFormattedDate, getGreeting } from "../../utils";
 
 export function HomePage() {
   const { currentSession } = useAuthStore();
-  const { greeting, formattedDate } = useTimingStore();
   const user = currentSession?.user;
 
   return (
@@ -20,8 +19,8 @@ export function HomePage() {
             Visão Geral do Estoque
           </Text>
           <Text size="sm" className="text-text-secondary mt-1">
-            {greeting()}, {user?.fullName}! Aqui está o resumo de hoje,{" "}
-            <span className="font-medium text-text-main">{formattedDate()}</span>.
+            {getGreeting()}, {user?.fullName}! Aqui está o resumo de hoje,{" "}
+            <span className="font-medium text-text-main">{getFormattedDate()}</span>.
           </Text>
         </Box>
         <Box className="flex items-center gap-3">
@@ -29,6 +28,8 @@ export function HomePage() {
             leftSection={<FaPlus size={14} />}
             radius="md"
             className="bg-primary hover:bg-primary/90 text-white font-semibold"
+            disabled
+            title="Módulo de requisições em desenvolvimento"
           >
             Nova Requisição
           </Button>
