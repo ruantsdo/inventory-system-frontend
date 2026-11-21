@@ -38,7 +38,7 @@ export function useFacilityContext() {
         ...currentSession.activeContext,
         facilityId: selected?.id ?? null,
         facilityName: selected?.name ?? null,
-        isGlobal: !selected,
+        isGlobal: !selected || selected.id === "ALL",
         activeRoleDisplayName,
       },
     });

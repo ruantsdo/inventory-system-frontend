@@ -101,9 +101,10 @@ apiClient.interceptors.request.use(
       const { useAuthStore } = await import("../stores/auth");
       const session = useAuthStore.getState().currentSession;
       const activeFacilityId = session?.activeContext?.facilityId;
+      const cookieValue = activeFacilityId ?? (session?.activeContext?.isGlobal ? "ALL" : null);
 
-      if (activeFacilityId) {
-        Cookies.set("active_facility_id", activeFacilityId, {
+      if (cookieValue) {
+        Cookies.set("active_facility_id", cookieValue, {
           expires: 365,
           path: "/",
           sameSite: "Lax",
