@@ -1,5 +1,4 @@
 import { Badge, Box, Button, Paper, Table, Text } from "@mantine/core";
-import { useNavigate } from "react-router";
 
 import type { Movement } from "../types/dashboard";
 
@@ -43,12 +42,6 @@ const movements: Movement[] = [
 ];
 
 export function RecentMovements() {
-  const navigate = useNavigate();
-
-  const handleNavigate = (route: string) => {
-    navigate(route);
-  };
-
   const tableRows = movements.map((element) => (
     <Table.Tr key={element.id}>
       <Table.Td>
@@ -78,7 +71,7 @@ export function RecentMovements() {
         <Text size="sm" fw={600} className="text-text-main">
           Últimas Movimentações
         </Text>
-        <Button variant="outline" onClick={() => handleNavigate("/movimentacoes")}>
+        <Button variant="outline" disabled title="Módulo em desenvolvimento">
           Ver todas as movimentações
         </Button>
       </Box>

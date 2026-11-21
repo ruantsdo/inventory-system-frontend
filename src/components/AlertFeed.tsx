@@ -1,7 +1,6 @@
 import { Badge, Box, Button, Paper, Text } from "@mantine/core";
 import { FaCapsules, FaSyringe } from "react-icons/fa";
 import { GiEyedropper } from "react-icons/gi";
-import { useNavigate } from "react-router";
 
 import type { AlertItem } from "../types/dashboard";
 
@@ -61,12 +60,6 @@ const urgencyLabels = {
 };
 
 export function AlertFeed() {
-  const navigate = useNavigate();
-
-  const handleNavigate = (route: string) => {
-    navigate(route);
-  };
-
   return (
     <Paper
       radius="lg"
@@ -112,7 +105,7 @@ export function AlertFeed() {
             </Box>
           ))}
 
-          <Button variant="outline" onClick={() => handleNavigate("/alertas")}>
+          <Button variant="outline" disabled title="Módulo em desenvolvimento">
             Ver todos os alertas
           </Button>
         </Box>
