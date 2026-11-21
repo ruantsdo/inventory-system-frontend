@@ -11,7 +11,7 @@ export const useManufacturersStore = create<ManufacturersState>((set, get) => ({
   manufacturers: [],
   total: 0,
   page: 1,
-  limit: 1000,
+  limit: 20,
   totalPages: 0,
   search: "",
   isActive: undefined,

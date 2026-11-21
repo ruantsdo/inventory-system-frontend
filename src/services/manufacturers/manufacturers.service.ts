@@ -14,7 +14,7 @@ interface ManufacturerEnvelope {
 
 export async function getManufacturers(
   page = 1,
-  limit = 1000,
+  limit = 20,
   search?: string,
   isActive?: boolean,
 ): Promise<PaginatedManufacturersOutput> {
