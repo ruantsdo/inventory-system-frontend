@@ -7,8 +7,9 @@ import {
   EditUserPage,
   ManufacturersPage,
   UsersDashboardPage,
-} from "../pages/app/";
+} from "../pages/app";
 import { NotFoundPage } from "../public/pages";
+import { PermissionGuard } from "./guards";
 
 export const appRoutes: RouteObject[] = [
   {
@@ -16,13 +17,47 @@ export const appRoutes: RouteObject[] = [
     children: [
       { index: true, element: <HomePage /> },
       { path: "dashboard", element: <HomePage /> },
-      { path: "users/create", element: <CreateUserPage /> },
-      { path: "users/edit/:userId", element: <EditUserPage /> },
-      { path: "users/dashboard", element: <UsersDashboardPage /> },
-      { path: "audits", element: <AuditsPage /> },
-      { path: "manufacturers", element: <ManufacturersPage /> },
+      {
+        path: "users/create",
+        element: (
+          <PermissionGuard permission="users.create">
+            <CreateUserPage />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: "users/edit/:userId",
+        element: (
+          <PermissionGuard permission="users.update">
+            <EditUserPage />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: "users/dashboard",
+        element: (
+          <PermissionGuard permission="users.view">
+            <UsersDashboardPage />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: "audits",
+        element: (
+          <PermissionGuard permission="audit.view">
+            <AuditsPage />
+          </PermissionGuard>
+        ),
+      },
+      {
+        path: "manufacturers",
+        element: (
+          <PermissionGuard permission="manufacturers.view">
+            <ManufacturersPage />
+          </PermissionGuard>
+        ),
+      },
     ],
   },
   { path: "*", element: <NotFoundPage /> },
 ];
-

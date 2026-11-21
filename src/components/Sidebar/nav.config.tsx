@@ -1,11 +1,7 @@
 import {
-  FaBoxes,
   FaChartBar,
   FaClipboardList,
-  FaExchangeAlt,
-  FaFileAlt,
   FaIndustry,
-  FaLayerGroup,
   FaTachometerAlt,
   FaUsers,
 } from "react-icons/fa";
@@ -17,6 +13,7 @@ export const NAV_ITEMS: NavItem[] = [
     icon: <FaTachometerAlt size={16} />,
     path: "/dashboard",
   },
+  /* Ocultados temporariamente até implementação dos módulos de negócio:
   {
     label: "Estoque",
     icon: <FaBoxes size={16} />,
@@ -41,11 +38,12 @@ export const NAV_ITEMS: NavItem[] = [
     path: "/movimentacoes",
     permission: "requests.view",
   },
+  */
   {
     label: "Fabricantes",
     icon: <FaIndustry size={16} />,
     path: "/manufacturers",
-    permission: "items.view",
+    permission: "manufacturers.view",
   },
   {
     label: "Usuários",
@@ -63,4 +61,3 @@ export const NAV_ITEMS: NavItem[] = [
 
 export const APP_LOGO_ICON = <FaChartBar size={16} className="text-white" />;
 export const APP_NAME = "Gestão de Estoque";
-
