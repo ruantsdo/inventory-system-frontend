@@ -14,7 +14,6 @@ import {
   ThemeIcon,
   Title,
 } from "@mantine/core";
-import CryptoJS from "crypto-js";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { FaLock, FaPlus, FaSignInAlt, FaUser } from "react-icons/fa";
@@ -42,19 +41,9 @@ export function LoginPage() {
     try {
       const raw = localStorage.getItem("rememberMe");
       if (!raw) return null;
-
-      try {
-        const parsed = JSON.parse(raw);
-        if (parsed.credential) return parsed;
-      } catch {}
-
-      const bytes = CryptoJS.AES.decrypt(
-        raw,
-        import.meta.env.VITE_STORAGE_SECRET || "inventory-system-secret-key",
-      );
-      const decryptedText = bytes.toString(CryptoJS.enc.Utf8);
-      if (!decryptedText) return null;
-      return JSON.parse(decryptedText);
+      const parsed = JSON.parse(raw);
+      if (parsed.credential) return parsed;
+      return null;
     } catch {
       localStorage.removeItem("rememberMe");
       return null;
@@ -229,4 +218,3 @@ export function LoginPage() {
     </Box>
   );
 }
-
