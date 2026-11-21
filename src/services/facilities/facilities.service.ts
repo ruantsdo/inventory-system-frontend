@@ -20,3 +20,4 @@ export async function getAllFacilitiesForSession(): Promise<FacilityForSession[]
   const { data } = await apiClient.get("/api/facilities/active/session");
   return data.facilities as FacilityForSession[];
 }
+
