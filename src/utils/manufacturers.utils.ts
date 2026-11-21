@@ -5,6 +5,13 @@ import type {
 } from "../types/api.contracts";
 import type { ManufacturerFormValues } from "../types/manufacturers";
 
+function normalizeWebsite(raw?: string | null): string {
+  const trimmed = (raw || "").trim();
+  if (!trimmed) return "";
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed;
+  return `https://${trimmed}`;
+}
+
 export function buildManufacturerPayload(
   form: ManufacturerFormValues,
 ): CreateManufacturerPayload | UpdateManufacturerPayload {
@@ -20,18 +27,15 @@ export function buildManufacturerPayload(
   const neighborhood = form.neighborhood?.trim();
   const hasAddress = Boolean(zipCode || street || number || complement || neighborhood);
 
+  const website = normalizeWebsite(form.website);
+
   return {
     name: form.name.trim(),
     tradeName: form.tradeName?.trim() || undefined,
     country: form.country || "BR",
     cnpj: form.cnpj ? form.cnpj.replace(/\D/g, "") : undefined,
     regulatoryCode: form.regulatoryCode?.trim() || undefined,
-    website: (() => {
-      const raw = form.website?.trim();
-      if (!raw) return undefined;
-      if (raw.startsWith("http://") || raw.startsWith("https://")) return raw;
-      return `https://${raw}`;
-    })(),
+    website: website || undefined,
     cityId: form.cityId || undefined,
     isActive: form.isActive !== undefined ? form.isActive : true,
     contact: hasContact
@@ -53,64 +57,67 @@ export function buildManufacturerPayload(
   };
 }
 
+function normalizeManufacturerFields(data: {
+  name?: string | null;
+  tradeName?: string | null;
+  country?: string | null;
+  cnpj?: string | null;
+  regulatoryCode?: string | null;
+  website?: string | null;
+  cityId?: string | null;
+  isActive?: boolean | null;
+  zipCode?: string | null;
+  street?: string | null;
+  number?: string | null;
+  complement?: string | null;
+  neighborhood?: string | null;
+  contactPerson?: string | null;
+  email?: string | null;
+  phone?: string | null;
+}) {
+  return {
+    name: (data.name ?? "").trim(),
+    tradeName: (data.tradeName ?? "").trim(),
+    country: data.country || "BR",
+    cnpj: (data.cnpj ?? "").replace(/\D/g, ""),
+    regulatoryCode: (data.regulatoryCode ?? "").trim(),
+    website: normalizeWebsite(data.website),
+    cityId: data.cityId ?? "",
+    isActive: data.isActive !== undefined && data.isActive !== null ? data.isActive : true,
+    zipCode: (data.zipCode ?? "").replace(/\D/g, ""),
+    street: (data.street ?? "").trim(),
+    number: (data.number ?? "").trim(),
+    complement: (data.complement ?? "").trim(),
+    neighborhood: (data.neighborhood ?? "").trim(),
+    contactPerson: (data.contactPerson ?? "").trim(),
+    email: (data.email ?? "").trim(),
+    phone: (data.phone ?? "").replace(/\D/g, ""),
+  };
+}
+
 export function isManufacturerFormUnchanged(
   values: ManufacturerFormValues,
   editing: ManufacturerOutput,
 ): boolean {
-  const currentName = values.name.trim();
-  const currentTradeName = (values.tradeName || "").trim();
-  const currentCountry = values.country || "BR";
-  const currentCnpj = (values.cnpj || "").replace(/\D/g, "");
-  const currentRegulatoryCode = (values.regulatoryCode || "").trim();
-  const currentWebsite = (values.website || "").trim();
-  const currentCityId = values.cityId || "";
-  const currentIsActive = values.isActive !== undefined ? values.isActive : true;
+  const v = normalizeManufacturerFields(values);
+  const e = normalizeManufacturerFields({
+    name: editing.name,
+    tradeName: editing.tradeName,
+    country: editing.country,
+    cnpj: editing.cnpj,
+    regulatoryCode: editing.regulatoryCode,
+    website: editing.website,
+    cityId: editing.cityId,
+    isActive: editing.isActive,
+    zipCode: editing.address?.zipCode,
+    street: editing.address?.street,
+    number: editing.address?.number,
+    complement: editing.address?.complement,
+    neighborhood: editing.address?.neighborhood,
+    contactPerson: editing.contact?.contactPerson,
+    email: editing.contact?.email,
+    phone: editing.contact?.phone,
+  });
 
-  const currentZipCode = (values.zipCode || "").replace(/\D/g, "");
-  const currentStreet = (values.street || "").trim();
-  const currentNumber = (values.number || "").trim();
-  const currentComplement = (values.complement || "").trim();
-  const currentNeighborhood = (values.neighborhood || "").trim();
-
-  const currentContactPerson = (values.contactPerson || "").trim();
-  const currentEmail = (values.email || "").trim();
-  const currentPhone = (values.phone || "").replace(/\D/g, "");
-
-  const originalName = (editing.name ?? "").trim();
-  const originalTradeName = (editing.tradeName ?? "").trim();
-  const originalCountry = editing.country || "BR";
-  const originalCnpj = (editing.cnpj ?? "").replace(/\D/g, "");
-  const originalRegulatoryCode = (editing.regulatoryCode ?? "").trim();
-  const originalWebsite = (editing.website ?? "").trim();
-  const originalCityId = editing.cityId ?? "";
-  const originalIsActive = editing.isActive ?? true;
-
-  const originalZipCode = (editing.address?.zipCode ?? "").replace(/\D/g, "");
-  const originalStreet = (editing.address?.street ?? "").trim();
-  const originalNumber = (editing.address?.number ?? "").trim();
-  const originalComplement = (editing.address?.complement ?? "").trim();
-  const originalNeighborhood = (editing.address?.neighborhood ?? "").trim();
-
-  const originalContactPerson = (editing.contact?.contactPerson ?? "").trim();
-  const originalEmail = (editing.contact?.email ?? "").trim();
-  const originalPhone = (editing.contact?.phone ?? "").replace(/\D/g, "");
-
-  return (
-    currentName === originalName &&
-    currentTradeName === originalTradeName &&
-    currentCountry === originalCountry &&
-    currentCnpj === originalCnpj &&
-    currentRegulatoryCode === originalRegulatoryCode &&
-    currentWebsite === originalWebsite &&
-    currentCityId === originalCityId &&
-    currentIsActive === originalIsActive &&
-    currentZipCode === originalZipCode &&
-    currentStreet === originalStreet &&
-    currentNumber === originalNumber &&
-    currentComplement === originalComplement &&
-    currentNeighborhood === originalNeighborhood &&
-    currentContactPerson === originalContactPerson &&
-    currentEmail === originalEmail &&
-    currentPhone === originalPhone
-  );
+  return JSON.stringify(v) === JSON.stringify(e);
 }
