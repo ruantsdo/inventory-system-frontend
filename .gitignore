@@ -26,3 +26,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local AI agent configs and audit reports
+.agents/
+.claude/
+.codex/
+.cursor/
+.gemini/
+AGENTS.md
+audit/
+
