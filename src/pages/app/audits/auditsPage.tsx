@@ -42,7 +42,7 @@ export function AuditsPage() {
           icon={<FaClipboardList size={20} />}
           label="Registros nesta Página"
           value={loading ? "—" : String(audits.length)}
-          description="Exibindo até 1000 por página"
+          description={`Exibindo até ${pageSize} por página`}
           color="success"
         />
         <StatCard

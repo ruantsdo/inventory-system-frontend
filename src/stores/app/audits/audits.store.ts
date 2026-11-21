@@ -6,7 +6,7 @@ import type { AuditFilterType, AuditsState } from "./audits.types";
 export const useAuditsStore = create<AuditsState>((set, get) => ({
   audits: [],
   page: 1,
-  pageSize: 1000,
+  pageSize: 50,
   filterType: "none",
   filterValue: "",
   selectedDetail: null,
@@ -19,18 +19,12 @@ export const useAuditsStore = create<AuditsState>((set, get) => ({
     set({ loading: true, error: null });
 
     try {
-      let result: AuditOutput[];
-
-      if (filterType === "action") {
-        result = await auditsService.getAuditsByAction(page, filterValue);
-      } else if (filterType === "category") {
-        result = await auditsService.getAuditsByCategory(page, filterValue);
-      } else if (filterType === "severity") {
-        result = await auditsService.getAuditsBySeverity(page, filterValue);
-      } else {
-        result = await auditsService.getAudits(page);
+      const params: auditsService.GetAuditsParams = { page };
+      if (filterType !== "none" && filterValue) {
+        params[filterType] = filterValue;
       }
 
+      const result: AuditOutput[] = await auditsService.getAudits(params);
       set({ audits: result });
     } catch {
       set({ error: "Não foi possível carregar os registros de auditoria. Tente novamente." });

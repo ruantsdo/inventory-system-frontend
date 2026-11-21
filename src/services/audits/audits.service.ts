@@ -1,30 +1,29 @@
 import type { AuditOutput, DetailAuditOutput } from "../../types/api.contracts";
 import { apiClient } from "../api.client";
 
-export async function getAudits(page: number): Promise<AuditOutput[]> {
-  const { data } = await apiClient.get("/api/audits", { params: { page } });
+export interface GetAuditsParams {
+  page?: number;
+  action?: string;
+  category?: string;
+  severity?: string;
+}
+
+export async function getAudits(params?: GetAuditsParams | number): Promise<AuditOutput[]> {
+  const query = typeof params === "number" ? { page: params } : (params ?? { page: 1 });
+  const { data } = await apiClient.get("/api/audits", { params: query });
   return data.auditEvents as AuditOutput[];
 }
 
 export async function getAuditsByAction(page: number, action: string): Promise<AuditOutput[]> {
-  const { data } = await apiClient.get("/api/audits/action", {
-    params: { page, action },
-  });
-  return data.auditEvents as AuditOutput[];
+  return getAudits({ page, action });
 }
 
 export async function getAuditsByCategory(page: number, category: string): Promise<AuditOutput[]> {
-  const { data } = await apiClient.get("/api/audits/category", {
-    params: { page, category },
-  });
-  return data.auditEvents as AuditOutput[];
+  return getAudits({ page, category });
 }
 
 export async function getAuditsBySeverity(page: number, severity: string): Promise<AuditOutput[]> {
-  const { data } = await apiClient.get("/api/audits/severity", {
-    params: { page, severity },
-  });
-  return data.auditEvents as AuditOutput[];
+  return getAudits({ page, severity });
 }
 
 export async function getAuditDetail(id: string): Promise<DetailAuditOutput> {
